@@ -1,4 +1,4 @@
-package it.personal.pitagora_back;
+package it.webdev.pw5.itsincom;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 

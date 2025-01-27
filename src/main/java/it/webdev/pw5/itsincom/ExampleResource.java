@@ -1,4 +1,4 @@
-package it.personal.pitagora_back;
+package it.webdev.pw5.itsincom;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
