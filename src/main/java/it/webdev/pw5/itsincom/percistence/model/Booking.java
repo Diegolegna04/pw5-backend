@@ -6,7 +6,7 @@ public class Booking {
     private String id;
     private String userId;
     private String eventId;
-    private Status status;
+    private String status;
     private Date date;
 
     public enum Status {
@@ -16,7 +16,7 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(String userId, String eventId, Status status, Date date) {
+    public Booking(String userId, String eventId, String status, Date date) {
         this.userId = userId;
         this.eventId = eventId;
         this.status = status;
@@ -47,11 +47,11 @@ public class Booking {
         this.eventId = eventId;
     }
 
-    public Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

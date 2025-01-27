@@ -28,21 +28,19 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
         return list("id_utente", userId);
     }
 
-    // Update booking status
     public Booking acceptBooking(ObjectId bookingId) {
         Booking booking = findBookingById(bookingId);
         if (booking != null) {
-            booking.setStatus(Booking.Status.valueOf("ACCEPTED"));
+            booking.setStatus("accettato");
             persistOrUpdate(booking);
         }
         return booking;
     }
 
-    // Delete a booking (if required)
     public Booking cancelBooking(ObjectId bookingId) {
         Booking booking = findBookingById(bookingId);
         if (booking != null) {
-            booking.setStatus(Booking.Status.valueOf("REJECTED"));
+            booking.setStatus("rifiutato");
             persistOrUpdate(booking);
         }
         return booking;
