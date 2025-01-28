@@ -34,6 +34,11 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
                     .entity("Session not found")
                     .type("text/plain")
                     .build();
+        } else if (e instanceof InvalidEmailFormat) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Email format is invalid")
+                    .type("text/plain")
+                    .build();
         }
 
 
