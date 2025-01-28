@@ -20,7 +20,7 @@ public class SessionService {
         return sessionRepository.createAndPersistSession(userId);
     }
 
-    public ObjectId findUtenteByToken(String token) {
+    public ObjectId findUsereByToken(String token) {
         return sessionRepository.findUtenteByToken(token);
     }
 }
