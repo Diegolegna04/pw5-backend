@@ -32,4 +32,12 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
         return null;
 
     }
+
+    public boolean checkSession(String tooken) {
+        Session s = find("token", tooken).firstResult();
+        if (s != null) {
+            return true;
+        }
+        return false;
+    }
 }

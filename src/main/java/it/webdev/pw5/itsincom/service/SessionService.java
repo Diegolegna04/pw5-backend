@@ -23,4 +23,8 @@ public class SessionService {
     public ObjectId findUsereByToken(String token) {
         return sessionRepository.findUtenteByToken(token);
     }
+
+    public boolean checkSession(String tooken) {
+        return sessionRepository.checkSession(tooken);
+    }
 }

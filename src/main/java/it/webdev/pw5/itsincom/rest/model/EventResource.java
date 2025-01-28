@@ -2,7 +2,7 @@ package it.webdev.pw5.itsincom.rest.model;
 
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
-import it.webdev.pw5.itsincom.rest.AuthService;
+import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.EventService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import jakarta.inject.Inject;

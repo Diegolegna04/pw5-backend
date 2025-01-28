@@ -1,13 +1,11 @@
-package it.webdev.pw5.itsincom.rest;
+package it.webdev.pw5.itsincom.service;
 
-import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import it.webdev.pw5.itsincom.percistence.repository.AuthRepository;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
-import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
 import it.webdev.pw5.itsincom.service.exception.EmptyField;
 import it.webdev.pw5.itsincom.service.exception.LoginNotPossible;
@@ -92,7 +90,7 @@ public class AuthService {
 
     // Check if any of the fields in both LoginRequest and RegisterRequest are empty
     private void checkEmptyFields(Object req) throws EmptyField {
-        if (req instanceof LoginRequest loginReq){
+        if (req instanceof LoginRequest loginReq) {
             if (loginReq.getEmail() == null || loginReq.getEmail().trim().isEmpty()) {
                 throw new EmptyField();
             }
@@ -117,4 +115,5 @@ public class AuthService {
     public User findById(ObjectId userId) {
         return authRepository.findById(userId);
     }
+
 }
