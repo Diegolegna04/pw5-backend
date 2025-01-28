@@ -11,7 +11,7 @@ import java.util.UUID;
 @ApplicationScoped
 public class SessionRepository implements PanacheMongoRepository<Session> {
 
-    public Session createAndPersistSession(ObjectId userId){
+    public Session createAndPersistSession(ObjectId userId) {
         Session s = new Session();
         s.setCreationDate(new Timestamp(System.currentTimeMillis()));
         s.setUserId(userId);
@@ -22,5 +22,14 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
 
     private String UUIDGenerator() {
         return UUID.randomUUID().toString();
+    }
+
+    public ObjectId findUtenteByToken(String token) {
+        Session s = find("token", token).firstResult();
+        if (s != null) {
+            return s.getUserId();
+        }
+        return null;
+
     }
 }

@@ -3,6 +3,7 @@ package it.webdev.pw5.itsincom.rest.model;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.service.BookingService;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

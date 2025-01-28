@@ -19,7 +19,7 @@ import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
 @ApplicationScoped
-public class AuthService implements PanacheMongoRepository<User> {
+public class AuthService {
 
     private final AuthRepository authRepository;
     private final SessionService sessionService;
@@ -50,7 +50,7 @@ public class AuthService implements PanacheMongoRepository<User> {
         // TODO: imposta la scelta dei ruoli
 
         // Persist it
-        persist(user);
+        authRepository.persist(user);
 
         return Response.ok().build();
     }
@@ -112,5 +112,9 @@ public class AuthService implements PanacheMongoRepository<User> {
         } else {
             throw new IllegalArgumentException("Tipo di richiesta non supportato");
         }
+    }
+
+    public User findById(ObjectId userId) {
+        return authRepository.findById(userId);
     }
 }

@@ -15,4 +15,13 @@ public class EventService {
     public List<Event> getAllEvents() {
         return eventRepository.getAllEvents();
     }
+
+    public boolean addEvent(Event event) {
+        try {
+            eventRepository.saveEvent(event);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

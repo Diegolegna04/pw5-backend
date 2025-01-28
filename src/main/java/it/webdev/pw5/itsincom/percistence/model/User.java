@@ -12,7 +12,7 @@ public class User extends PanacheMongoEntity {
     private String password;
     private String role;
 
-    private enum Role {
+    public enum Role {
         ADMIN,
         USER,
         HOSTING_COMPANY

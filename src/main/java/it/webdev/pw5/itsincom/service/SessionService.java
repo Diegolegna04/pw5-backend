@@ -19,4 +19,8 @@ public class SessionService {
     public Session createAndPersistSession(ObjectId userId) {
         return sessionRepository.createAndPersistSession(userId);
     }
+
+    public ObjectId findUtenteByToken(String token) {
+        return sessionRepository.findUtenteByToken(token);
+    }
 }
