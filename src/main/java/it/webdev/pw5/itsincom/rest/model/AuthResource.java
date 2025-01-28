@@ -152,7 +152,7 @@ public class AuthResource {
                     .httpOnly(true)
                     .secure(false)
                     .build();
-            return Response.ok("Logout succeeded").cookie(newCookie).build();
+            return Response.ok().cookie(newCookie).build();
         } catch (Exception e) {
             throw new SessionNotFound();
         }
