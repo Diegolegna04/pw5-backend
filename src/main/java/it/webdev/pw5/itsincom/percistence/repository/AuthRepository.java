@@ -1,10 +1,12 @@
 package it.webdev.pw5.itsincom.percistence.repository;
 
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
+import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.service.HashCalculator;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.SessionScoped;
 import org.bson.types.ObjectId;
 
 @ApplicationScoped

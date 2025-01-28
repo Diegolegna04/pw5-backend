@@ -4,22 +4,26 @@ import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import org.bson.types.ObjectId;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @MongoEntity(collection = "session")
 public class Session extends PanacheMongoEntity {
     private ObjectId id;
     private String token;
     private ObjectId userId;
-    private Timestamp creationDate;
+    private LocalDateTime creationDate;
 
     public Session() {
     }
 
-    public Session(String token, ObjectId userId, Timestamp creationDate) {
-        this.token = token;
-        this.userId = userId;
-        this.creationDate = creationDate;
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public String getToken() {
@@ -38,19 +42,11 @@ public class Session extends PanacheMongoEntity {
         this.userId = userId;
     }
 
-    public Timestamp getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Timestamp creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
-    }
-
-    public ObjectId getId() {
-        return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
     }
 }

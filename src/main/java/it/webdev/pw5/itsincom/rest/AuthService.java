@@ -8,10 +8,7 @@ import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.SessionService;
-import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
-import it.webdev.pw5.itsincom.service.exception.EmptyField;
-import it.webdev.pw5.itsincom.service.exception.LoginNotPossible;
-import it.webdev.pw5.itsincom.service.exception.WrongEmailOrPassword;
+import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NewCookie;
@@ -72,10 +69,10 @@ public class AuthService {
             throw new WrongEmailOrPassword();
         }
 
+        // TODO: se l'utente elimina il cookie ma ha la sessione attiva bisogna reimpostarlo?
         // Check if the user already has a session
-        try {
-            Session session = sessionRepository.find("userId", userId).firstResult();
-        } catch (Exception e) {
+        Session existingSession = sessionRepository.findSessionByUserId(userId);
+        if (existingSession != null) {
             throw new LoginNotPossible();
         }
 
@@ -90,9 +87,15 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public void logoutUser(String sessionCookie) throws SessionNotFound {
+        sessionService.deleteSession(sessionCookie);
+    }
+
+
     // Check if any of the fields in both LoginRequest and RegisterRequest are empty
     private void checkEmptyFields(Object req) throws EmptyField {
-        if (req instanceof LoginRequest loginReq){
+        if (req instanceof LoginRequest loginReq) {
             if (loginReq.getEmail() == null || loginReq.getEmail().trim().isEmpty()) {
                 throw new EmptyField();
             }
@@ -110,10 +113,11 @@ public class AuthService {
                 throw new EmptyField();
             }
         } else {
-            throw new IllegalArgumentException("Tipo di richiesta non supportato");
+            throw new IllegalArgumentException("Request type is not supported");
         }
     }
 
+    // TODO: sposta in userRepository
     public User findById(ObjectId userId) {
         return authRepository.findById(userId);
     }
