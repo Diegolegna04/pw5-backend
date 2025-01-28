@@ -41,6 +41,14 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
 
     }
 
+    public boolean checkSession(String tooken) {
+        Session s = find("token", tooken).firstResult();
+        if (s != null) {
+            return true;
+        }
+        return false;
+    }
+
     public Session findSessionByCookie(String sessionCookie) throws SessionNotFound {
         try {
             return find("token", sessionCookie).firstResult();

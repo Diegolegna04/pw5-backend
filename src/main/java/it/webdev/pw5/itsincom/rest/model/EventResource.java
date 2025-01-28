@@ -1,10 +1,8 @@
 package it.webdev.pw5.itsincom.rest.model;
 
-import io.quarkus.security.spi.runtime.AuthenticationSuccessEvent;
 import it.webdev.pw5.itsincom.percistence.model.Event;
-import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
-import it.webdev.pw5.itsincom.rest.AuthService;
+import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.EventService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import jakarta.inject.Inject;
@@ -12,9 +10,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
-import org.jboss.logging.annotations.Pos;
-
-import java.util.List;
 
 @Path("/api/events")
 public class EventResource {
@@ -24,8 +19,31 @@ public class EventResource {
     AuthService authService;
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAllEvents() {
         return Response.ok(eventService.getAllEvents()).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getEventById(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
+
+        // Controlla se il token è presente
+        if (token == null || token.isEmpty()) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Missing session token").build();
+        }
+
+        Event event = eventService.getEventById(id);
+
+        if (event == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Event not found").build();
+        }
+
+        return Response.ok(event).build();
     }
 
     @POST
@@ -41,7 +59,7 @@ public class EventResource {
         }
 
         // Verifica esistenza della sessione dell'utente
-        ObjectId userId = sessionService.findUtenteByToken(token);
+        ObjectId userId = sessionService.findUsereByToken(token);
         if (userId == null) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("Invalid or expired session token").build();
@@ -81,6 +99,9 @@ public class EventResource {
                     .entity("An unexpected error occurred: " + e.getMessage()).build();
         }
     }
+
+    //TODO: Implementare il metodo per la modifica di un evento
+    //TODO: Implementare il metodo per la cancellazione di un evento
 
 
 }

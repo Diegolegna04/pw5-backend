@@ -10,7 +10,7 @@ public class User extends PanacheMongoEntity {
     private String name;
     private String email;
     private String password;
-    private String role;
+    private Role role;
 
     public enum Role {
         ADMIN,
@@ -21,7 +21,7 @@ public class User extends PanacheMongoEntity {
     public User() {
     }
 
-    public User(String name, String email, String password, String role) {
+    public User(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -52,11 +52,11 @@ public class User extends PanacheMongoEntity {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 

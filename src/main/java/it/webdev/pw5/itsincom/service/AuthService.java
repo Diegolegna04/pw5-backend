@@ -1,6 +1,5 @@
-package it.webdev.pw5.itsincom.rest;
+package it.webdev.pw5.itsincom.service;
 
-import io.quarkus.mongodb.panache.PanacheMongoRepository;
 import it.webdev.pw5.itsincom.percistence.repository.AuthRepository;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
@@ -9,6 +8,10 @@ import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.*;
+import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
+import it.webdev.pw5.itsincom.service.exception.EmptyField;
+import it.webdev.pw5.itsincom.service.exception.LoginNotPossible;
+import it.webdev.pw5.itsincom.service.exception.WrongEmailOrPassword;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NewCookie;
