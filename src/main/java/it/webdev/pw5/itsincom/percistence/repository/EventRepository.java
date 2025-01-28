@@ -27,5 +27,4 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
         return list("id_utente", userId);
     }
 
-
 }

@@ -67,12 +67,7 @@ public class EventResource {
                     .entity("Invalid or expired session token").build();
         }
 
-        // Verifica che l'utente sia autorizzato a creare l'evento
         User user = authService.findById(userId);
-        if (user == null) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("User not found").build();
-        }
 
         if (!user.getRole().equals(User.Role.HOSTING_COMPANY)) {
             return Response.status(Response.Status.FORBIDDEN)
@@ -101,21 +96,65 @@ public class EventResource {
         }
     }
 
-    //TODO: Implementare il metodo per la modifica di un evento
-
     @PUT
     @Path("/update/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
+    public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id, Event event) {
+        // Controlla se il token è presente
         if (token == null || token.isEmpty()) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("Missing session token").build();
         }
 
+        // Verifica esistenza della sessione dell'utente
+        ObjectId userId = sessionService.findUserByToken(token);
+        if (userId == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Invalid or expired session token").build();
+        }
 
-        return null;
+        // Verifica che l'utente esista
+        User user = authService.findById(userId);
+        if (user == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("User not found").build();
+        }
+
+        // Verifica che l'utente abbia il ruolo appropriato
+        if (!user.getRole().equals(User.Role.HOSTING_COMPANY)) {
+            return Response.status(Response.Status.FORBIDDEN)
+                    .entity("You do not have permission to update events").build();
+        }
+
+        // Verifica che l'ID dell'evento sia valido
+        if (id == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Invalid event ID").build();
+        }
+
+        // Recupera l'evento esistente
+        Event existingEvent = eventService.findById(id);
+        if (existingEvent == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Event not found").build();
+        }
+
+        // Aggiorna i campi dell'evento
+        try {
+            eventService.updateEvent(event, existingEvent);
+            return Response.ok("Event updated successfully").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
+        } catch (Exception e) {
+            e.printStackTrace(); // Log dell'errore
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("An error occurred while updating the event").build();
+        }
     }
+
+
     //TODO: Implementare il metodo per la cancellazione di un evento
 
 
