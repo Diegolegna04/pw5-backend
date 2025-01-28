@@ -3,13 +3,11 @@ package it.webdev.pw5.itsincom.rest.model;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
-import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
-import it.webdev.pw5.itsincom.service.exception.EmptyField;
-import it.webdev.pw5.itsincom.service.exception.LoginNotPossible;
-import it.webdev.pw5.itsincom.service.exception.WrongEmailOrPassword;
+import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
@@ -77,7 +75,7 @@ public class AuthResource {
         }
 
         try {
-            ObjectId userId = sessionService.findUsereByToken(token);
+            ObjectId userId = sessionService.findUserByToken(token);
             if (userId == null) {
                 return Response.status(Response.Status.UNAUTHORIZED)
                         .entity("Invalid or expired session token").build();
@@ -95,6 +93,28 @@ public class AuthResource {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("An unexpected error occurred while verifying the session").build();
+        }
+    }
+
+    @DELETE
+    @Path("/logout")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logoutUser(@CookieParam("SESSION_COOKIE") String sessionCookie) throws SessionNotFound {
+        try {
+            if (sessionCookie == null) {
+                throw new IllegalArgumentException("Session cookie is empty");
+            }
+            authService.logoutUser(sessionCookie);
+            NewCookie newCookie = new NewCookie.Builder("SESSION_COOKIE").value("")
+                    .path("/")
+                    .maxAge(0)
+                    .httpOnly(true)
+                    .secure(false)
+                    .build();
+            return Response.ok("Logout succeeded").cookie(newCookie).build();
+        } catch (Exception e) {
+            throw new SessionNotFound();
         }
     }
 }

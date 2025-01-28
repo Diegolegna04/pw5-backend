@@ -14,9 +14,9 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
         return listAll();
     }
 
-    public Event saveEvent(Event event) {
+    public void saveEvent(Event event) {
         this.persist(event);
-        return event;
+
     }
 
     public Event findEventById(ObjectId id) {

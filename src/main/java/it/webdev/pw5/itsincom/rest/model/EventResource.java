@@ -15,7 +15,9 @@ import org.bson.types.ObjectId;
 public class EventResource {
     @Inject
     EventService eventService;
+    @Inject
     SessionService sessionService;
+    @Inject
     AuthService authService;
 
     @GET
@@ -59,7 +61,7 @@ public class EventResource {
         }
 
         // Verifica esistenza della sessione dell'utente
-        ObjectId userId = sessionService.findUsereByToken(token);
+        ObjectId userId = sessionService.findUserByToken(token);
         if (userId == null) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("Invalid or expired session token").build();
@@ -94,13 +96,26 @@ public class EventResource {
             }
         } catch (Exception e) {
             // Registra l'errore per scopi di debugging
-            e.printStackTrace(); // Sostituisci con un logger come SLF4J o JUL in produzione
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("An unexpected error occurred: " + e.getMessage()).build();
         }
     }
 
     //TODO: Implementare il metodo per la modifica di un evento
+
+    @PUT
+    @Path("/update/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
+        if (token == null || token.isEmpty()) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("Missing session token").build();
+        }
+
+
+        return null;
+    }
     //TODO: Implementare il metodo per la cancellazione di un evento
 
 

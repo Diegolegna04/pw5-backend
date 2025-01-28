@@ -17,24 +17,7 @@ public class Event extends PanacheMongoEntity {
     private String location;
     private List<String> hostingCompanies;
     private List<Speaker> speakers;
-    private List<String> topics;
-    private List<String> guests;
     private List<User> participants;
-
-    public Event() {}
-
-    public Event(String title, String type, List<String> topics, Date date, String location, List<String> guests,
-                 List<String> hostingCompanies, List<User> participants, List<Speaker> speakers) {
-        this.title = title;
-        this.type = type;
-        this.topics = topics;
-        this.date = date;
-        this.location = location;
-        this.guests = guests;
-        this.hostingCompanies = hostingCompanies;
-        this.participants = participants;
-        this.speakers = speakers;
-    }
 
     public ObjectId getId() {
         return id;
@@ -90,22 +73,6 @@ public class Event extends PanacheMongoEntity {
 
     public void setSpeakers(List<Speaker> speakers) {
         this.speakers = speakers;
-    }
-
-    public List<String> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(List<String> topics) {
-        this.topics = topics;
-    }
-
-    public List<String> getGuests() {
-        return guests;
-    }
-
-    public void setGuests(List<String> guests) {
-        this.guests = guests;
     }
 
     public List<User> getParticipants() {

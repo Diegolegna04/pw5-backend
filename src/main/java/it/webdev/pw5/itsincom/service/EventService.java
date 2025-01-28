@@ -18,12 +18,8 @@ public class EventService {
     }
 
     public boolean addEvent(Event event) {
-        try {
-            eventRepository.saveEvent(event);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        eventRepository.saveEvent(event);
+        return true;
     }
 
     public Event getEventById(ObjectId id) {
