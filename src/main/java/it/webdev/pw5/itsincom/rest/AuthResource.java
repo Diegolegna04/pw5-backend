@@ -1,6 +1,9 @@
-package it.webdev.pw5.itsincom.rest.model;
+package it.webdev.pw5.itsincom.rest;
 
+import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.rest.model.LoginRequest;
+import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.*;
@@ -23,16 +26,56 @@ public class AuthResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response registerUser(RegisterRequest req) throws EmailNotAvailable, EmptyField {
-        return authService.registerUser(req);
+    public Response registerUser(RegisterRequest req) throws EmailNotAvailable, EmptyField, InvalidEmailFormat {
+        try{
+            authService.checkEmailFormat(req);
+            authService.checkEmptyFields(req);
+        } catch (InvalidEmailFormat e){
+            throw new InvalidEmailFormat();
+        } catch (EmptyField e){
+            throw new EmptyField();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
+        }
+
+        try {
+            authService.registerUser(req);
+            return Response.ok().entity("Registration completed successfully").build();
+        } catch (EmailNotAvailable e) {
+            throw new EmailNotAvailable();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
+        }
     }
 
     @Path("/login")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(LoginRequest req) throws EmptyField, LoginNotPossible, WrongEmailOrPassword {
-        return authService.loginUser(req);
+    public Response login(LoginRequest req) throws EmptyField, LoginNotPossible, WrongEmailOrPassword, InvalidEmailFormat {
+        try{
+            authService.checkEmailFormat(req);
+            authService.checkEmptyFields(req);
+        } catch (InvalidEmailFormat e){
+            throw new InvalidEmailFormat();
+        } catch (EmptyField e){
+            throw new EmptyField();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
+        }
+
+        try{
+            Session s = authService.loginUser(req);
+            return Response.ok("Login succeeded").
+                    cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
+                    .build();
+        } catch (WrongEmailOrPassword e) {
+            throw new WrongEmailOrPassword();
+        } catch (LoginNotPossible e) {
+            throw new LoginNotPossible();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
+        }
     }
 
     @Path("/checkSession")
@@ -56,7 +99,6 @@ public class AuthResource {
                         .entity("Session is invalid or expired").build();
             }
         } catch (Exception e) {
-            // Log dell'eccezione (sostituire con un logger in produzione)
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("An unexpected error occurred while verifying the session").build();
@@ -112,7 +154,7 @@ public class AuthResource {
                     .httpOnly(true)
                     .secure(false)
                     .build();
-            return Response.ok("Logout succeeded").cookie(newCookie).build();
+            return Response.ok().cookie(newCookie).build();
         } catch (Exception e) {
             throw new SessionNotFound();
         }

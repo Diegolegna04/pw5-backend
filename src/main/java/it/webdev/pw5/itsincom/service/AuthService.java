@@ -4,6 +4,7 @@ import it.webdev.pw5.itsincom.percistence.repository.AuthRepository;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
+import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.SessionService;
@@ -17,6 +18,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @ApplicationScoped
 public class AuthService {
@@ -32,36 +36,27 @@ public class AuthService {
     }
 
     @Transactional
-    public Response registerUser(RegisterRequest req) throws EmailNotAvailable, EmptyField {
-        // Check if there are any empty fields
-        checkEmptyFields(req);
-
+    public void registerUser(RegisterRequest req) throws EmailNotAvailable{
         // Check if the inserted email is already present in DB
         if (authRepository.findByEmail(req.getEmail()) != null) {
             throw new EmailNotAvailable();
         }
 
-        // TODO: sposta la creazione dell'user nella UserRepository
         // Create the new user
         User user = new User();
-        user.setName(req.getEmail());
+        user.setName(req.getName());
         user.setEmail(req.getEmail());
         user.setPassword(authRepository.hashPassword(req.getPassword()));
-        // TODO: imposta la scelta dei ruoli
+        user.setRole(req.getRole());
 
         // Persist it
         authRepository.persist(user);
-
-        return Response.ok().build();
     }
 
     @Transactional
-    public Response loginUser(LoginRequest req) throws EmptyField, WrongEmailOrPassword, LoginNotPossible {
-        // Check if there are any empty fields
-        checkEmptyFields(req);
-
+    public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, LoginNotPossible {
         // Check if the inserted email exists in DB
-        User user = authRepository.findByEmail(req.getEmail()); // TODO: spostare il metodo in UserRepository
+        User user = authRepository.findByEmail(req.getEmail());
         if (user == null) {
             throw new WrongEmailOrPassword();
         }
@@ -79,15 +74,7 @@ public class AuthService {
             throw new LoginNotPossible();
         }
 
-        Session userSession = sessionService.createAndPersistSession(userId);
-
-        // If everything is correct, return a successful response
-        return Response.ok("Login effettuato, sessione creata correttamente").
-                cookie(new NewCookie.Builder("SESSION_COOKIE")
-                        .value(userSession.getToken())
-                        .path("/")
-                        .build())
-                .build();
+        return sessionService.createAndPersistSession(userId);
     }
 
     @Transactional
@@ -97,7 +84,7 @@ public class AuthService {
 
 
     // Check if any of the fields in both LoginRequest and RegisterRequest are empty
-    private void checkEmptyFields(Object req) throws EmptyField {
+    public void checkEmptyFields(Object req) throws EmptyField {
         if (req instanceof LoginRequest loginReq) {
             if (loginReq.getEmail() == null || loginReq.getEmail().trim().isEmpty()) {
                 throw new EmptyField();
@@ -114,6 +101,25 @@ public class AuthService {
             }
             if (registerReq.getName() == null || registerReq.getName().trim().isEmpty()) {
                 throw new EmptyField();
+            }
+        } else {
+            throw new IllegalArgumentException("Request type is not supported");
+        }
+    }
+
+    public void checkEmailFormat(Object req) throws InvalidEmailFormat {
+        String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        if (req instanceof LoginRequest loginReq) {
+            Pattern pattern = Pattern.compile(EMAIL_REGEX);
+            Matcher matcher = pattern.matcher(loginReq.getEmail());
+            if (!matcher.matches()){
+                throw new InvalidEmailFormat();
+            }
+        } else if (req instanceof RegisterRequest registerReq) {
+            Pattern pattern = Pattern.compile(EMAIL_REGEX);
+            Matcher matcher = pattern.matcher(registerReq.getEmail());
+            if (!matcher.matches()){
+                throw new InvalidEmailFormat();
             }
         } else {
             throw new IllegalArgumentException("Request type is not supported");

@@ -1,17 +1,15 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.percistence.model.User;
+
 public class RegisterRequest {
     private String name;
     private String email;
     private String password;
+    private User.Role role;
 
     public RegisterRequest() {
 
-    }
-    public RegisterRequest(String name, String email, String password) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
     }
 
     public String getName() {
@@ -36,5 +34,13 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public User.Role getRole() {
+        return role;
+    }
+
+    public void setRole(User.Role role) {
+        this.role = role;
     }
 }
