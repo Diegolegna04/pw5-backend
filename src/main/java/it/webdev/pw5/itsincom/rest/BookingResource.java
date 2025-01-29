@@ -20,8 +20,12 @@ public class BookingResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BookingResponse> getAllBookings() {
-        return bookingService.getAllBookings();
+    public List<BookingResponse> getAllBookings(@QueryParam("page") @DefaultValue("1") int page,
+                                                @QueryParam("size") @DefaultValue("10") int size) {
+        if (page < 1 || size < 1) {
+            throw new IllegalArgumentException("Invalid page or size");
+        }
+        return bookingService.getAllBookings(page, size);
     }
 
     @GET
@@ -59,7 +63,7 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
         try {
-            bookingService.validateUserPermissions(token, User.Role.HOSTING_COMPANY);
+            bookingService.validateUserPermissions(token, User.Role.ADMIN);
             Booking updatedBooking = bookingService.acceptBooking(id);
             return Response.ok(updatedBooking).build();
         } catch (IllegalArgumentException e) {
@@ -75,7 +79,7 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
         try {
-            bookingService.validateUserPermissions(token, User.Role.HOSTING_COMPANY);
+            bookingService.validateUserPermissions(token, User.Role.ADMIN);
             BookingResponse updatedBooking = bookingService.cancelBooking(id);
             return Response.ok(updatedBooking).build();
         } catch (IllegalArgumentException e) {

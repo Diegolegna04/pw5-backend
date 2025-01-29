@@ -28,9 +28,10 @@ public class BookingService {
     @Inject
     SessionService sessionService;
 
-    public List<BookingResponse> getAllBookings() {
+    public List<BookingResponse> getAllBookings(int page, int size) {
         try {
-            return bookingRepository.getAllBookings().stream().map(this::toBookingResponse).toList();
+            return bookingRepository.findAll().page(page - 1, size)
+                    .list().stream().map(this::toBookingResponse).toList();
         } catch (Exception e) {
             System.err.println("An unexpected error occurred while fetching all bookings: " + e.getMessage());
             throw new RuntimeException("Failed to fetch all bookings", e);
