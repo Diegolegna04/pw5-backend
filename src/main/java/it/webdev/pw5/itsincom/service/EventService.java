@@ -25,4 +25,38 @@ public class EventService {
     public Event getEventById(ObjectId id) {
         return eventRepository.findEventById(id);
     }
+
+    public void updateEvent(Event event, Event existingEvent) {
+        if (event == null) {
+            throw new IllegalArgumentException("Event data cannot be null");
+        }
+
+        // Aggiorna i campi solo se presenti nel nuovo evento
+        if (event.getTitle() != null) {
+            existingEvent.setTitle(event.getTitle());
+        }
+        if (event.getDate() != null) {
+            existingEvent.setDate(event.getDate());
+        }
+        if (event.getLocation() != null) {
+            existingEvent.setLocation(event.getLocation());
+        }
+        if (event.getHostingCompanies() != null) {
+            existingEvent.setHostingCompanies(event.getHostingCompanies());
+        }
+        if (event.getSpeakers() != null) {
+            existingEvent.setSpeakers(event.getSpeakers());
+        }
+        if (event.getParticipants() != null) {
+            existingEvent.setParticipants(event.getParticipants());
+        }
+
+        // Salva le modifiche
+        existingEvent.update();
+    }
+
+
+    public Event findById(ObjectId id) {
+        return eventRepository.findById(id);
+    }
 }
