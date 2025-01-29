@@ -14,12 +14,18 @@ public class BookingService {
     @Inject
     BookingRepository bookingRepository;
 
+
+
     public List<BookingResponse> getAllBookings() {
         return bookingRepository.getAllBookings().stream().map(this::toBookingResponse).toList();
     }
 
     public void createBooking(Booking booking) {
         bookingRepository.saveBooking(booking);
+
+        if (booking.getStatus() == Booking.Status.ACCEPTED) {
+            // send email
+        }
     }
 
     public BookingResponse findBookingById(ObjectId id) {
@@ -37,6 +43,8 @@ public class BookingService {
     public BookingResponse cancelBooking(ObjectId bookingId) {
         return toBookingResponse(bookingRepository.cancelBooking(bookingId));
     }
+
+
 
     private BookingResponse toBookingResponse(Booking booking) {
         BookingResponse response = new BookingResponse();
