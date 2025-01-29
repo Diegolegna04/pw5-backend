@@ -20,13 +20,13 @@ public class BookingService {
     UserRepository userRepository;
 
     @Inject
-    EmailService emailService;
-
-    @Inject
     AuthService authService;
 
     @Inject
     SessionService sessionService;
+
+    @Inject
+    EmailService emailService;
 
     public List<BookingResponse> getAllBookings(int page, int size) {
         try {
@@ -38,13 +38,18 @@ public class BookingService {
         }
     }
 
-    public void createBooking(Booking booking) {
+    public void createBooking(String token, Booking booking) {
+        ObjectId userId = sessionService.validateSession(token);
+        User user = authService.findById(userId);
         try {
             if (booking.getEventId() == null) {
                 throw new IllegalArgumentException("EventId is required");
             }
             if (booking.getUserId() == null) {
                 throw new IllegalArgumentException("UserId is required");
+            }
+            if (!user.getRole().equals(User.Role.USER)) {
+                throw new SecurityException("You do not have permission to create events");
             }
 
             bookingRepository.saveBooking(booking);
@@ -82,37 +87,31 @@ public class BookingService {
         }
     }
 
-    public Booking acceptBooking(ObjectId bookingId) {
+    public void acceptBooking(String token, ObjectId bookingId) {
+        ObjectId userId = sessionService.validateSession(token);
+        User user = authService.findById(userId);
+        if (!user.getRole().equals(User.Role.ADMIN)) {
+            throw new SecurityException("You do not have permission to create events");
+        }
         try {
-            return bookingRepository.acceptBooking(bookingId);
+            bookingRepository.acceptBooking(bookingId);
         } catch (Exception e) {
             System.err.println("An unexpected error occurred while accepting booking: " + e.getMessage());
             throw new RuntimeException("Failed to accept booking", e);
         }
     }
 
-    public BookingResponse cancelBooking(ObjectId bookingId) {
+    public void cancelBooking(String token, ObjectId bookingId) {
+        ObjectId userId = sessionService.validateSession(token);
+        User user = authService.findById(userId);
+        if (!user.getRole().equals(User.Role.ADMIN)) {
+            throw new SecurityException("You do not have permission to cancel events");
+        }
         try {
-            return toBookingResponse(bookingRepository.cancelBooking(bookingId));
+            bookingRepository.cancelBooking(bookingId);
         } catch (Exception e) {
             System.err.println("An unexpected error occurred while canceling booking: " + e.getMessage());
             throw new RuntimeException("Failed to cancel booking", e);
-        }
-    }
-
-    public void validateUserPermissions(String token, User.Role requiredRole) {
-        if (token == null || token.isEmpty()) {
-            throw new IllegalArgumentException("Missing session token");
-        }
-
-        ObjectId userId = sessionService.findUserByToken(token);
-        if (userId == null) {
-            throw new IllegalArgumentException("Invalid or expired session token");
-        }
-
-        User user = authService.findById(userId);
-        if (!user.getRole().equals(requiredRole)) {
-            throw new IllegalArgumentException("You do not have permission to perform this action");
         }
     }
 

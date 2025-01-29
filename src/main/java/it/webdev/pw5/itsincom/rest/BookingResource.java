@@ -47,8 +47,7 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createBooking(@CookieParam("SESSION_COOKIE") String token, Booking booking) {
         try {
-            bookingService.validateUserPermissions(token, User.Role.USER);
-            bookingService.createBooking(booking);
+            bookingService.createBooking(token, booking);
             return Response.ok(booking).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
@@ -63,9 +62,8 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
         try {
-            bookingService.validateUserPermissions(token, User.Role.ADMIN);
-            Booking updatedBooking = bookingService.acceptBooking(id);
-            return Response.ok(updatedBooking).build();
+            bookingService.acceptBooking(token, id);
+            return Response.ok().entity("booking accepted").build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (Exception e) {
@@ -79,9 +77,8 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
         try {
-            bookingService.validateUserPermissions(token, User.Role.ADMIN);
-            BookingResponse updatedBooking = bookingService.cancelBooking(id);
-            return Response.ok(updatedBooking).build();
+            bookingService.cancelBooking(token, id);
+            return Response.ok().entity("booking canceled").build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (Exception e) {

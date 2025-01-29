@@ -18,6 +18,9 @@ public class Booking {
         PENDING, ACCEPTED, REJECTED
     }
 
+    public Booking() {
+    }
+
     public ObjectId getId() {
         return id;
     }
