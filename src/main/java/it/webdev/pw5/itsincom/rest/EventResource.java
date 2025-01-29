@@ -156,7 +156,6 @@ public class EventResource {
     }
 
 
-    //TODO: Implementare il metodo per la cancellazione di un evento
     @DELETE
     @Path("/delete/{id}")
     @Produces(MediaType.APPLICATION_JSON)

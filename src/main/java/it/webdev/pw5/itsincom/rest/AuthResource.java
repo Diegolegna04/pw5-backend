@@ -39,6 +39,7 @@ public class AuthResource {
         }
 
         try {
+            //TODO: aggiungere di default il role user e aggiungere la possibilità di insermipento P.IVA e settare HOSTING_COMPANY
             authService.registerUser(req);
             return Response.ok().entity("Registration completed successfully").build();
         } catch (EmailNotAvailable e) {
@@ -78,7 +79,7 @@ public class AuthResource {
         }
     }
 
-    @Path("/checkSession")
+    @Path("/check-session")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response checkSession(@CookieParam("SESSION_COOKIE") String token) {
@@ -106,7 +107,7 @@ public class AuthResource {
     }
 
 
-    @Path("/checkCategory")
+    @Path("/check-category")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

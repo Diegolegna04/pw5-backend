@@ -1,4 +1,4 @@
-package it.webdev.pw5.itsincom.rest.model;
+package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.service.AuthService;
@@ -15,7 +15,9 @@ public class UserResource {
 
     @Inject
     SessionService sessionService;
+    @Inject
     UserService userService;
+    @Inject
     AuthService authService;
 
     @GET
