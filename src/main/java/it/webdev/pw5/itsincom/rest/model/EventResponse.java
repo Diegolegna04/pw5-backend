@@ -9,6 +9,11 @@ public class EventResponse {
     private String title;
     private String location;
     private int participantCount;
+    private Filter filter;
+
+    public enum Filter {
+        UPCOMING, PAST
+    }
 
     public EventResponse() {
     }
@@ -59,6 +64,14 @@ public class EventResponse {
 
     public void setParticipantCount(int participantCount) {
         this.participantCount = participantCount;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 
 }

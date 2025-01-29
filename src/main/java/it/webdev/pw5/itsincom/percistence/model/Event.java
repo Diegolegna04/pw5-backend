@@ -20,6 +20,12 @@ public class Event extends PanacheMongoEntity {
     private List<Speaker> speakers;
     private List<ObjectId> participants;
     private Integer maxParticipants;
+    private Filter filter;
+
+    public enum Filter {
+        UPCOMING, PAST
+    }
+
 
     public Event() {
         this.participants = new ArrayList<>();
@@ -99,6 +105,14 @@ public class Event extends PanacheMongoEntity {
 
     public void setMaxParticipants(Integer maxParticipants) {
         this.maxParticipants = maxParticipants;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(Filter filter) {
+        this.filter = filter;
     }
 
 }
