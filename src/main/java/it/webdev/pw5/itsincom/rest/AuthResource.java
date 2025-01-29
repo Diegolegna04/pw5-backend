@@ -1,6 +1,8 @@
-package it.webdev.pw5.itsincom.rest.model;
+package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.rest.model.LoginRequest;
+import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.*;

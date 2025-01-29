@@ -2,6 +2,7 @@ package it.webdev.pw5.itsincom.service;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.repository.BookingRepository;
+import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
@@ -13,28 +14,36 @@ public class BookingService {
     @Inject
     BookingRepository bookingRepository;
 
-    public List<Booking> getAllBookings() {
-        return bookingRepository.getAllBookings();
+    public List<BookingResponse> getAllBookings() {
+        return bookingRepository.getAllBookings().stream().map(this::toBookingResponse).toList();
     }
 
-    public Booking createBooking(Booking booking) {
-        return bookingRepository.saveBooking(booking);
+    public void createBooking(Booking booking) {
+        bookingRepository.saveBooking(booking);
     }
 
-    public Booking findBookingById(ObjectId id) {
-        return bookingRepository.findBookingById(id);
+    public BookingResponse findBookingById(ObjectId id) {
+        return toBookingResponse(bookingRepository.findBookingById(id));
     }
 
-    public List<Booking> findBookingsByUserId(int userId) {
-        return bookingRepository.findBookingsByUserId(userId);
+    public List<BookingResponse> findBookingsByUserId(int userId) {
+        return bookingRepository.findBookingsByUserId(userId).stream().map(this::toBookingResponse).toList();
     }
 
     public Booking acceptBooking(ObjectId bookingId) {
         return bookingRepository.acceptBooking(bookingId);
     }
 
-    public Booking cancelBooking(ObjectId bookingId) {
-        return bookingRepository.cancelBooking(bookingId);
+    public BookingResponse cancelBooking(ObjectId bookingId) {
+        return toBookingResponse(bookingRepository.cancelBooking(bookingId));
+    }
+
+    private BookingResponse toBookingResponse(Booking booking) {
+        BookingResponse response = new BookingResponse();
+        response.setName(booking.getName());
+        response.setEventDate(booking.getEventDate());
+        response.setStatus(booking.getStatus());
+        return response;
     }
 
 

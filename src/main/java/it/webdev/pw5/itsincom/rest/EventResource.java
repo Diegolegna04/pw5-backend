@@ -1,4 +1,4 @@
-package it.webdev.pw5.itsincom.rest.model;
+package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
