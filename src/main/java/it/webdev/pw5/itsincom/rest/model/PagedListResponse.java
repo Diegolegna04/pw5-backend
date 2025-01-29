@@ -4,19 +4,20 @@ import java.util.List;
 
 public class PagedListResponse<T> {
     private List<T> items;
-    private int page;
+    private int currentPage;
     private int pageSize;
-    private int totalItems;
+    private long totalItems;
     private int totalPages;
 
-    public PagedListResponse(List<T> items, int page, int pageSize, int totalItems, int totalPages) {
+    public PagedListResponse(List<T> items, int currentPage, int pageSize, long totalItems, int totalPages) {
         this.items = items;
-        this.page = page;
+        this.currentPage = currentPage;
         this.pageSize = pageSize;
         this.totalItems = totalItems;
         this.totalPages = totalPages;
     }
 
+    // Getter e Setter
     public List<T> getItems() {
         return items;
     }
@@ -25,12 +26,12 @@ public class PagedListResponse<T> {
         this.items = items;
     }
 
-    public int getPage() {
-        return page;
+    public int getCurrentPage() {
+        return currentPage;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
     }
 
     public int getPageSize() {
@@ -41,11 +42,11 @@ public class PagedListResponse<T> {
         this.pageSize = pageSize;
     }
 
-    public int getTotalItems() {
+    public long getTotalItems() {
         return totalItems;
     }
 
-    public void setTotalItems(int totalItems) {
+    public void setTotalItems(long totalItems) {
         this.totalItems = totalItems;
     }
 

@@ -13,8 +13,12 @@ public class EventService {
     @Inject
     EventRepository eventRepository;
 
-    public List<Event> getAllEvents() {
-        return eventRepository.getAllEvents();
+    public List<Event> getAllEvents(int page, int size) {
+        return Event.findAll().page(page - 1, size).list();
+    }
+
+    public long countAllEvents() {
+        return Event.count();
     }
 
     public boolean addEvent(Event event) {

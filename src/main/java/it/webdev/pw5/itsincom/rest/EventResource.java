@@ -2,6 +2,7 @@ package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.EventService;
 import it.webdev.pw5.itsincom.service.SessionService;
@@ -10,6 +11,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
+
+import java.util.List;
 
 @Path("/api/events")
 public class EventResource {
@@ -23,9 +26,23 @@ public class EventResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllEvents() {
-        return Response.ok(eventService.getAllEvents()).build();
+    public Response getAllEvents(@QueryParam("page") @DefaultValue("1") int page,
+                                 @QueryParam("size") @DefaultValue("10") int size) {
+        if (page < 1 || size < 1) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Page and size must be greater than 0").build();
+        }
+
+        // Calcola l'offset e il numero massimo di risultati
+        List<Event> events = eventService.getAllEvents(page, size);
+        long totalCount = eventService.countAllEvents(); // Metodo per contare tutti gli eventi
+
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        PagedListResponse<Event> response = new PagedListResponse<>(events, page, size, totalCount, totalPages);
+        return Response.ok(response).build();
     }
+
 
     @GET
     @Path("/{id}")
