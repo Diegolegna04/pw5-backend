@@ -14,8 +14,7 @@ public class User extends PanacheMongoEntity {
 
     public enum Role {
         ADMIN,
-        USER,
-        HOSTING_COMPANY
+        USER
     }
 
     public User() {

@@ -30,4 +30,16 @@ public class SessionService {
     public boolean checkSession(String token) {
         return sessionRepository.checkSession(token);
     }
+
+    public ObjectId validateSession(String token) {
+        if (token == null || token.isEmpty()) {
+            throw new SecurityException("Missing session token");
+        }
+
+        ObjectId userId = findUserByToken(token);
+        if (userId == null) {
+            throw new SecurityException("Invalid or expired session token");
+        }
+        return userId;
+    }
 }
