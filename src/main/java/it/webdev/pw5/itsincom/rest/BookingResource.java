@@ -20,8 +20,12 @@ public class BookingResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<BookingResponse> getAllBookings() {
-        return bookingService.getAllBookings();
+    public List<BookingResponse> getAllBookings(@QueryParam("page") @DefaultValue("1") int page,
+                                                @QueryParam("size") @DefaultValue("10") int size) {
+        if (page < 1 || size < 1) {
+            throw new IllegalArgumentException("Invalid page or size");
+        }
+        return bookingService.getAllBookings(page, size);
     }
 
     @GET
