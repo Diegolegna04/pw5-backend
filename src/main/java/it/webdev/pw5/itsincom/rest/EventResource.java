@@ -31,13 +31,7 @@ public class EventResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getEventById(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
-
-        // Controlla se il token è presente
-        if (token == null || token.isEmpty()) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Missing session token").build();
-        }
+    public Response getEventById(@PathParam("id") ObjectId id) {
 
         Event event = eventService.getEventById(id);
 
