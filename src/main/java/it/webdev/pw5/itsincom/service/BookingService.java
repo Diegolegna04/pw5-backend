@@ -51,6 +51,9 @@ public class BookingService {
             if (!user.getRole().equals(User.Role.USER)) {
                 throw new SecurityException("You do not have permission to create events");
             }
+            if (bookingRepository.checkDoubleBooking(booking.getUserId(), booking.getEventId())) {
+                throw new IllegalArgumentException("This event has already been booked");
+            }
 
             bookingRepository.saveBooking(booking);
 

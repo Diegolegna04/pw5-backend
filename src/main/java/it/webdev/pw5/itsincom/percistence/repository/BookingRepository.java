@@ -57,4 +57,7 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
             persistOrUpdate(booking);
         }
     }
+    public boolean checkDoubleBooking(ObjectId userId, ObjectId eventId) {
+        return find("userId = ?1 and eventId = ?2", userId, eventId).firstResult() != null;
+    }
 }
