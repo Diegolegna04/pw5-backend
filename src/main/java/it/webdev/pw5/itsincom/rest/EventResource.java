@@ -1,6 +1,7 @@
 package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Event;
+import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import it.webdev.pw5.itsincom.service.EventService;
 import jakarta.inject.Inject;
@@ -21,7 +22,7 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllEvents(@QueryParam("page") @DefaultValue("1") int page,
                                  @QueryParam("size") @DefaultValue("10") int size) {
-        PagedListResponse<Event> response = eventService.getAllEvents(page, size);
+        PagedListResponse<EventResponse> response = eventService.getAllEvents(page, size);
         return Response.ok(response).build();
     }
 

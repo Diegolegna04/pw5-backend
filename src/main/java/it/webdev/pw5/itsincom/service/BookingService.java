@@ -1,8 +1,10 @@
 package it.webdev.pw5.itsincom.service;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
+import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.BookingRepository;
+import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
 import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -10,6 +12,7 @@ import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class BookingService {
@@ -27,6 +30,9 @@ public class BookingService {
 
     @Inject
     EmailService emailService;
+
+    @Inject
+    EventRepository eventRepository;
 
     public List<BookingResponse> getAllBookings(int page, int size) {
         try {
@@ -56,6 +62,10 @@ public class BookingService {
             }
 
             bookingRepository.saveBooking(booking);
+
+            Event event = eventRepository.findEventById(booking.getEventId());
+            event.addParticipant(booking.getUserId());
+            eventRepository.persistOrUpdate(event);
 
             String userEmail = userRepository.findUserById(booking.getUserId()).getEmail();
             emailService.sendBookingConfirmation(
@@ -118,11 +128,12 @@ public class BookingService {
         }
     }
 
-    private BookingResponse toBookingResponse(Booking booking) {
+    public BookingResponse toBookingResponse(Booking booking) {
         BookingResponse response = new BookingResponse();
         response.setName(booking.getName());
         response.setEventDate(booking.getEventDate());
         response.setStatus(booking.getStatus());
+
         return response;
     }
 }

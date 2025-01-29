@@ -3,12 +3,14 @@ package it.webdev.pw5.itsincom.service;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
+import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class EventService {
@@ -20,16 +22,18 @@ public class EventService {
     @Inject
     EventRepository eventRepo;
 
-    public PagedListResponse<Event> getAllEvents(int page, int size) {
-        if (page < 1 || size < 1) {
-            throw new IllegalArgumentException("Page and size must be greater than 0");
+
+    public PagedListResponse<EventResponse> getAllEvents(int page, int size) {
+        try {
+            List<EventResponse> eventResponses = eventRepo.findAll().page(page - 1, size)
+                    .list().stream().map(this::toEventResponse).collect(Collectors.toList());
+            long totalCount = eventRepo.count();
+            int totalPages = (int) Math.ceil((double) totalCount / size);
+            return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred while fetching all events: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch all events", e);
         }
-
-        List<Event> events = eventRepo.findAll().page(page - 1, size).list();
-        long totalCount = eventRepo.count();
-        int totalPages = (int) Math.ceil((double) totalCount / size);
-
-        return new PagedListResponse<>(events, page, size, totalCount, totalPages);
     }
 
     public Event getEventById(ObjectId id) {
@@ -88,5 +92,16 @@ public class EventService {
 
         Event event = getEventById(id);
         event.delete();
+    }
+
+    private EventResponse toEventResponse(Event event) {
+        EventResponse response = new EventResponse();
+        response.setId(event.getId().toString());
+        response.setDate(event.getDate());
+        response.setType(event.getType());
+        response.setTitle(event.getTitle());
+        response.setLocation(event.getLocation());
+        response.setParticipantCount(event.getParticipants().size());
+        return response;
     }
 }

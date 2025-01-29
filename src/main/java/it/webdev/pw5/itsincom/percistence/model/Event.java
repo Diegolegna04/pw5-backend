@@ -4,6 +4,7 @@ import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,8 +18,12 @@ public class Event extends PanacheMongoEntity {
     private String location;
     private List<String> hostingCompanies;
     private List<Speaker> speakers;
-    private List<User> participants;
+    private List<ObjectId> participants;
     private Integer maxParticipants;
+
+    public Event() {
+        this.participants = new ArrayList<>();
+    }
 
     public ObjectId getId() {
         return id;
@@ -76,12 +81,16 @@ public class Event extends PanacheMongoEntity {
         this.speakers = speakers;
     }
 
-    public List<User> getParticipants() {
+    public List<ObjectId> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<User> participants) {
+    public void setParticipants(List<ObjectId> participants) {
         this.participants = participants;
+    }
+
+    public void addParticipant(ObjectId userId) {
+        this.participants.add(userId);
     }
 
     public Integer getMaxParticipants() {
@@ -91,4 +100,5 @@ public class Event extends PanacheMongoEntity {
     public void setMaxParticipants(Integer maxParticipants) {
         this.maxParticipants = maxParticipants;
     }
+
 }
