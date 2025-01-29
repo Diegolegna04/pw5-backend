@@ -18,6 +18,7 @@ public class Event extends PanacheMongoEntity {
     private List<String> hostingCompanies;
     private List<Speaker> speakers;
     private List<User> participants;
+    private Integer maxParticipants;
 
     public ObjectId getId() {
         return id;
@@ -81,5 +82,13 @@ public class Event extends PanacheMongoEntity {
 
     public void setParticipants(List<User> participants) {
         this.participants = participants;
+    }
+
+    public Integer getMaxParticipants() {
+        return maxParticipants;
+    }
+
+    public void setMaxParticipants(Integer maxParticipants) {
+        this.maxParticipants = maxParticipants;
     }
 }

@@ -51,6 +51,10 @@ public class EventService {
             existingEvent.setParticipants(event.getParticipants());
         }
 
+        if (event.getMaxParticipants() != null) {
+            existingEvent.setMaxParticipants(event.getMaxParticipants());
+        }
+
         // Salva le modifiche
         existingEvent.update();
     }
@@ -58,5 +62,9 @@ public class EventService {
 
     public Event findById(ObjectId id) {
         return eventRepository.findById(id);
+    }
+
+    public void deleteEvent(Event existingEvent) {
+        existingEvent.delete();
     }
 }
