@@ -48,7 +48,7 @@ public class AuthService {
         user.setName(req.getName());
         user.setEmail(req.getEmail());
         user.setPassword(authRepository.hashPassword(req.getPassword()));
-        user.setRole(req.getRole());
+        user.setRole(User.Role.USER);
 
         // Persist it
         authRepository.persist(user);
