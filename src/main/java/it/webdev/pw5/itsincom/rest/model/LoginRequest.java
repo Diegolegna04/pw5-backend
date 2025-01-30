@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.service.exception.XSSAttackAttempt;
 import jakarta.validation.constraints.*;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
@@ -20,17 +21,19 @@ public class LoginRequest {
 
     }
 
-    public void sanitize() {
+    public void sanitize() throws XSSAttackAttempt {
         this.email = sanitizeInput(this.email);
         this.password = sanitizeInput(this.password);
     }
 
     // Utilize JSoup to sanitize and remove dangerous input
-    private String sanitizeInput(String input) {
-        if (input != null) {
-            return Jsoup.clean(input, Safelist.basic());
+    private String sanitizeInput(String input) throws XSSAttackAttempt {
+        // Sanitize input
+        String sanitizedInput = Jsoup.clean(input, Safelist.basic());
+        if (sanitizedInput.isEmpty()) {
+            throw new XSSAttackAttempt();
         }
-        return null;
+        return sanitizedInput;
     }
 
     public String getEmail() {

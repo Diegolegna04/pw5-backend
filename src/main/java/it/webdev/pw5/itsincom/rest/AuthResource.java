@@ -31,10 +31,8 @@ public class AuthResource {
 
     @Path("/register")
     @POST
-    public Response registerUser(@Valid RegisterRequest req) throws EmailNotAvailable {
-        System.out.println("Before sanitization: " + req.getName());
+    public Response registerUser(@Valid RegisterRequest req) throws EmailNotAvailable, XSSAttackAttempt {
         req.sanitize();
-        System.out.println("After sanitization: " + req.getName());
         authService.registerUser(req);
         return Response.ok().entity("Registration completed successfully").build();
     }
@@ -48,7 +46,7 @@ public class AuthResource {
 
     @Path("/login")
     @POST
-    public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified {
+    public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified, XSSAttackAttempt {
         req.sanitize();
         Session s = authService.loginUser(req);
         return Response.ok("Login succeeded").
@@ -65,7 +63,6 @@ public class AuthResource {
         sessionService.checkSession(token);
         return Response.ok().entity("Session is valid").build();
     }
-
 
     @Path("/check-role")
     @GET

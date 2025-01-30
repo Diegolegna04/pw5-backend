@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.service.exception.XSSAttackAttempt;
 import jakarta.validation.constraints.*;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
@@ -22,21 +23,20 @@ public class RegisterRequest {
 
     }
 
-    public void sanitize() {
+    public void sanitize() throws XSSAttackAttempt {
         this.name = sanitizeInput(this.name);
         this.email = sanitizeInput(this.email);
         this.password = sanitizeInput(this.password);
     }
 
     // Utilize JSoup to sanitize and remove dangerous input
-    private String sanitizeInput(String input) {
-        if (input != null && !input.trim().isEmpty()) {
-            // Sanitize input
-            String sanitizedInput = Jsoup.clean(input, Safelist.basic());
-            // Return sanitized input if it's valid, else return (es. "Anonymous")
-            return sanitizedInput.isEmpty() ? "Anonymous" : sanitizedInput;
+    private String sanitizeInput(String input) throws XSSAttackAttempt {
+        // Sanitize input
+        String sanitizedInput = Jsoup.clean(input, Safelist.basic());
+        if (sanitizedInput.isEmpty()) {
+            throw new XSSAttackAttempt();
         }
-        return "Anonymous";
+        return sanitizedInput;
     }
 
     public @NotBlank(message = "Name cannot be empty") String getName() {
