@@ -8,22 +8,19 @@ import it.webdev.pw5.itsincom.service.HashCalculator;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 @ApplicationScoped
 public class AuthRepository implements PanacheMongoRepository<User> {
 
-    private final HashCalculator hashCalculator;
+    @Inject
+    HashCalculator hashCalculator;
 
     public AuthRepository(HashCalculator hashCalculator) {
         this.hashCalculator = hashCalculator;
     }
 
-    // Find a user by email
-    // TODO: spostare in userRepository?
-    public User findUserByEmail(String email) {
-        return find("email", email).firstResult();
-    }
 
     public User findUserByVerificationToken(String emailVerificationToken) throws UserNotFound {
         User u = find("verificationToken", emailVerificationToken).firstResult();

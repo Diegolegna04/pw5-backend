@@ -1,6 +1,5 @@
 package it.webdev.pw5.itsincom.rest.model;
 
-import it.webdev.pw5.itsincom.percistence.model.User;
 import jakarta.validation.constraints.*;
 
 public class RegisterRequest {
@@ -17,41 +16,31 @@ public class RegisterRequest {
     @Pattern(regexp = "^(?!.*\\s).*$", message = "Password cannot contain spaces")
     private String password;
 
-    private User.Role role;
-
     public RegisterRequest() {
 
     }
 
-    public String getName() {
+    public @NotBlank(message = "Name cannot be empty") String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(@NotBlank(message = "Name cannot be empty") String name) {
         this.name = name;
     }
 
-    public String getEmail() {
+    public @NotBlank(message = "Email cannot be empty") @Email(message = "Please provide a valid email address") @Pattern(regexp = "^(?!.*\\s).*$", message = "Email cannot contain spaces") String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(@NotBlank(message = "Email cannot be empty") @Email(message = "Please provide a valid email address") @Pattern(regexp = "^(?!.*\\s).*$", message = "Email cannot contain spaces") String email) {
         this.email = email;
     }
 
-    public String getPassword() {
+    public @NotBlank(message = "Password cannot be empty") @Size(min = 6, message = "Password must be at least 6 characters long") @Pattern(regexp = "^(?!.*\\s).*$", message = "Password cannot contain spaces") String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(@NotBlank(message = "Password cannot be empty") @Size(min = 6, message = "Password must be at least 6 characters long") @Pattern(regexp = "^(?!.*\\s).*$", message = "Password cannot contain spaces") String password) {
         this.password = password;
-    }
-
-    public User.Role getRole() {
-        return role;
-    }
-
-    public void setRole(User.Role role) {
-        this.role = role;
     }
 }

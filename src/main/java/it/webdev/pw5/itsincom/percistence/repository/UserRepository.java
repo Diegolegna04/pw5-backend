@@ -16,12 +16,7 @@ public class UserRepository implements PanacheMongoRepository<User> {
         return findById(id);
     }
 
-    public User findUserByUsername(String username) {
-        return find("username", username).firstResult();
-    }
-
     public User findUserByEmail(String email) {
         return find("email", email).firstResult();
     }
-
 }
