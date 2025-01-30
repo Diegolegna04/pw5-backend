@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.service;
 
+import io.quarkus.panache.common.Sort;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
@@ -33,7 +34,8 @@ public class EventService {
             Date currentDate = new Date();
 
             // Recupera gli eventi e assegna il filtro UPCOMING/PAST
-            List<EventResponse> eventResponses = eventRepo.findAll().page(page - 1, size)
+            List<EventResponse> eventResponses = eventRepo.findAll(Sort.by("date").descending())
+                    .page(page - 1, size)
                     .list()
                     .stream()
                     .map(event -> {
