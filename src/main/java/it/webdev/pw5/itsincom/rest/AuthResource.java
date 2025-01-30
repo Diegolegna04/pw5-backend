@@ -33,6 +33,13 @@ public class AuthResource {
         return Response.ok().entity("Registration completed successfully").build();
     }
 
+    @GET
+    @Path("/verify")
+    public Response verifyEmail(@QueryParam("token") String emailVerificationToken) throws UserNotFound {
+        authService.verifyEmail(emailVerificationToken);
+        return Response.ok().entity("Email verified").build();
+    }
+
     @Path("/login")
     @POST
     public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {

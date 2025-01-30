@@ -5,6 +5,7 @@ import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.service.HashCalculator;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.SessionScoped;
 import org.bson.types.ObjectId;
@@ -22,6 +23,14 @@ public class AuthRepository implements PanacheMongoRepository<User> {
     // TODO: spostare in userRepository?
     public User findUserByEmail(String email) {
         return find("email", email).firstResult();
+    }
+
+    public User findUserByVerificationToken(String emailVerificationToken) throws UserNotFound {
+        User u = find("verificationToken", emailVerificationToken).firstResult();
+        if (u == null){
+            throw new UserNotFound();
+        }
+        return u;
     }
 
     // Check if the credentials while logging in inserted are correct

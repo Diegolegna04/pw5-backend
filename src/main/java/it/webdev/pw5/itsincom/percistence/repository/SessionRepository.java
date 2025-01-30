@@ -49,7 +49,7 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
     }
 
 
-    private String UUIDGenerator() {
+    public String UUIDGenerator() {
         return UUID.randomUUID().toString();
     }
 }

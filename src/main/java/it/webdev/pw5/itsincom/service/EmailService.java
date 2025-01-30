@@ -15,4 +15,8 @@ public class EmailService {
     public void sendBookingConfirmation(String to, String subject, String body) {
         mailer.send(Mail.withText(to, subject, body));
     }
+
+    public void sendVerificationEmail(String email, String message) {
+        mailer.send(Mail.withHtml(email, "Verifica la tua email", message));
+    }
 }

@@ -11,20 +11,32 @@ public class User extends PanacheMongoEntity {
     private String email;
     private String password;
     private Role role;
+    private String verificationToken;
 
     public enum Role {
         ADMIN,
-        USER
+        USER,
+        NOT_VERIFIED
     }
 
     public User() {
     }
 
-    public User(String name, String email, String password, Role role) {
+    public User(ObjectId id, String name, String email, String password, Role role, String verificationToken) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.verificationToken = verificationToken;
+    }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -59,11 +71,11 @@ public class User extends PanacheMongoEntity {
         this.role = role;
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getVerificationToken() {
+        return verificationToken;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
     }
 }

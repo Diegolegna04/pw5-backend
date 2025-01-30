@@ -4,37 +4,29 @@ import it.webdev.pw5.itsincom.percistence.repository.AuthRepository;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
-import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
-import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.*;
 import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
-import it.webdev.pw5.itsincom.service.exception.EmptyField;
-import it.webdev.pw5.itsincom.service.exception.LoginNotPossible;
 import it.webdev.pw5.itsincom.service.exception.WrongEmailOrPassword;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.NewCookie;
-import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @ApplicationScoped
 public class AuthService {
 
-    private final AuthRepository authRepository;
-    private final SessionService sessionService;
-    private final SessionRepository sessionRepository;
+    @Inject
+    AuthRepository authRepository;
+    @Inject
+    SessionService sessionService;
+    @Inject
+    SessionRepository sessionRepository;
+    @Inject
+    EmailService emailService;
 
-    public AuthService(AuthRepository authRepository, SessionService sessionService, SessionRepository sessionRepository) {
-        this.authRepository = authRepository;
-        this.sessionService = sessionService;
-        this.sessionRepository = sessionRepository;
-    }
 
     @Transactional
     public void registerUser(RegisterRequest req) throws EmailNotAvailable {
@@ -42,16 +34,36 @@ public class AuthService {
         if (authRepository.findUserByEmail(req.getEmail()) != null) {
             throw new EmailNotAvailable();
         }
-
+        String token = sessionRepository.UUIDGenerator();
         // Create the new user
         User user = new User();
         user.setName(req.getName());
         user.setEmail(req.getEmail());
         user.setPassword(authRepository.hashPassword(req.getPassword()));
-        user.setRole(User.Role.USER);
-
+        user.setRole(User.Role.NOT_VERIFIED);
+        user.setVerificationToken(token);
         // Persist it
         authRepository.persist(user);
+        // Send the verification email
+        sendVerificationEmail(token, req.getEmail());
+    }
+
+    private void sendVerificationEmail(String token, String email) {
+        // Build the verification link
+        String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
+        String message = "Clicca sul <a href=\"" + verificationLink + "\">link</a> di verifica per autenticare la tua email";
+        // Send verification
+        emailService.sendVerificationEmail(email, message);
+    }
+
+    @Transactional
+    public void verifyEmail(String emailVerificationToken) throws UserNotFound {
+        // Find the user that has the verification token sent by email
+        User user = authRepository.findUserByVerificationToken(emailVerificationToken);
+        // Change user's role from "NOT_VERIFIED" to "USER" and delete the verification token
+        user.setRole(User.Role.USER);
+        user.setVerificationToken(null);
+        authRepository.update(user);
     }
 
     @Transactional
