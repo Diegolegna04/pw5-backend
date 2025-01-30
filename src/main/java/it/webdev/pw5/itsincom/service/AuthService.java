@@ -4,6 +4,7 @@ import it.webdev.pw5.itsincom.percistence.repository.AuthRepository;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
+import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.exception.*;
@@ -26,12 +27,14 @@ public class AuthService {
     SessionRepository sessionRepository;
     @Inject
     EmailService emailService;
+    @Inject
+    UserRepository userRepository;
 
 
     @Transactional
     public void registerUser(RegisterRequest req) throws EmailNotAvailable {
         // Check if the inserted email is already present in DB
-        if (authRepository.findUserByEmail(req.getEmail()) != null) {
+        if (userRepository.findUserByEmail(req.getEmail()) != null) {
             throw new EmailNotAvailable();
         }
         String token = sessionRepository.UUIDGenerator();
@@ -40,7 +43,8 @@ public class AuthService {
         user.setName(req.getName());
         user.setEmail(req.getEmail());
         user.setPassword(authRepository.hashPassword(req.getPassword()));
-        user.setRole(User.Role.NOT_VERIFIED);
+        user.setRole(User.Role.USER);
+        user.setStatus(User.Status.NOT_VERIFIED);
         user.setVerificationToken(token);
         // Persist it
         authRepository.persist(user);
@@ -61,7 +65,7 @@ public class AuthService {
         // Find the user that has the verification token sent by email
         User user = authRepository.findUserByVerificationToken(emailVerificationToken);
         // Change user's role from "NOT_VERIFIED" to "USER" and delete the verification token
-        user.setRole(User.Role.USER);
+        user.setStatus(User.Status.VERIFIED);
         user.setVerificationToken(null);
         authRepository.update(user);
     }
@@ -69,11 +73,11 @@ public class AuthService {
     @Transactional
     public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {
         // Check if the inserted email exists in DB
-        // TODO: spostare in userRepository?
-        User user = authRepository.findUserByEmail(req.getEmail());
+        User user = userRepository.findUserByEmail(req.getEmail());
         if (user == null) {
             throw new WrongEmailOrPassword();
         }
+
         // Check credentials and get the userId (necessary for creating his session)
         ObjectId userId = authRepository.checkCredentials(req.getEmail(), req.getPassword());
         if (userId == null) {
