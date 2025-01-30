@@ -4,6 +4,8 @@ import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.service.BookingService;
+import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -64,7 +66,7 @@ public class BookingResource {
         try {
             bookingService.acceptBooking(token, id);
             return Response.ok().entity("booking accepted").build();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | UserNotFound | SessionNotFound e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
     }
@@ -77,7 +79,7 @@ public class BookingResource {
         try {
             bookingService.cancelBooking(token, id);
             return Response.ok().entity("booking canceled").build();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | UserNotFound | SessionNotFound e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
     }
