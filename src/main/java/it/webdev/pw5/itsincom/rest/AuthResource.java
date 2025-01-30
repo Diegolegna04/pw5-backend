@@ -45,7 +45,7 @@ public class AuthResource {
 
     @Path("/login")
     @POST
-    public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {
+    public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified {
         Session s = authService.loginUser(req);
         return Response.ok("Login succeeded").
                 cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
@@ -87,6 +87,6 @@ public class AuthResource {
                 .httpOnly(true)
                 .secure(false)
                 .build();
-        return Response.ok().cookie(newCookie).build();
+        return Response.ok().entity("Logout succeeded").cookie(newCookie).build();
     }
 }

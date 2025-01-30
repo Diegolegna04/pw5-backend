@@ -34,6 +34,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
             case "CookieIsNull" -> "Cookie is null.";
             case "UserNotFound" -> "User not found.";
             case "UserUnauthorized" -> "User is not authorized to perform this action.";
+            case "UserIsNotVerified" -> "User must verify his email before proceeding.";
             default -> "Unexpected error: " + e.getMessage();
         };
     }
@@ -42,7 +43,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
         return switch (e.getClass().getSimpleName()) {
             case "EmailNotAvailable", "LoginNotPossible" -> Response.Status.CONFLICT;
             case "EmptyField", "InvalidEmailFormat", "CookieIsNull" -> Response.Status.BAD_REQUEST;
-            case "WrongEmailOrPassword", "UserUnauthorized" -> Response.Status.UNAUTHORIZED;
+            case "WrongEmailOrPassword", "UserUnauthorized", "UserIsNotVerified" -> Response.Status.UNAUTHORIZED;
             case "SessionNotFound", "UserNotFound" -> Response.Status.NOT_FOUND;
             default -> Response.Status.INTERNAL_SERVER_ERROR;
         };

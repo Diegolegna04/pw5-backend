@@ -71,13 +71,17 @@ public class AuthService {
     }
 
     @Transactional
-    public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {
+    public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified {
         // Check if the inserted email exists in DB
         User user = userRepository.findUserByEmail(req.getEmail());
         if (user == null) {
             throw new WrongEmailOrPassword();
         }
-
+        // Check if the user has verified his email
+        boolean isVerified = checkIfUserIsVerified(user);
+        if (!isVerified){
+            throw new UserIsNotVerified();
+        }
         // Check credentials and get the userId (necessary for creating his session)
         ObjectId userId = authRepository.checkCredentials(req.getEmail(), req.getPassword());
         if (userId == null) {
@@ -95,5 +99,9 @@ public class AuthService {
     @Transactional
     public void logoutUser(String token) throws SessionNotFound {
         sessionService.deleteSession(token);
+    }
+
+    private boolean checkIfUserIsVerified(User user){
+        return user.getStatus().equals(User.Status.VERIFIED);
     }
 }
