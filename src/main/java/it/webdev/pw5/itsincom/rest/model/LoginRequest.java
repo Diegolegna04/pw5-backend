@@ -1,6 +1,8 @@
 package it.webdev.pw5.itsincom.rest.model;
 
 import jakarta.validation.constraints.*;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 public class LoginRequest {
 
@@ -16,6 +18,19 @@ public class LoginRequest {
 
     public LoginRequest () {
 
+    }
+
+    public void sanitize() {
+        this.email = sanitizeInput(this.email);
+        this.password = sanitizeInput(this.password);
+    }
+
+    // Utilize JSoup to sanitize and remove dangerous input
+    private String sanitizeInput(String input) {
+        if (input != null) {
+            return Jsoup.clean(input, Safelist.basic());
+        }
+        return null;
     }
 
     public String getEmail() {

@@ -32,6 +32,9 @@ public class AuthResource {
     @Path("/register")
     @POST
     public Response registerUser(@Valid RegisterRequest req) throws EmailNotAvailable {
+        System.out.println("Before sanitization: " + req.getName());
+        req.sanitize();
+        System.out.println("After sanitization: " + req.getName());
         authService.registerUser(req);
         return Response.ok().entity("Registration completed successfully").build();
     }
@@ -46,6 +49,7 @@ public class AuthResource {
     @Path("/login")
     @POST
     public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified {
+        req.sanitize();
         Session s = authService.loginUser(req);
         return Response.ok("Login succeeded").
                 cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())

@@ -1,6 +1,8 @@
 package it.webdev.pw5.itsincom.rest.model;
 
 import jakarta.validation.constraints.*;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 public class RegisterRequest {
     @NotBlank(message = "Name cannot be empty")
@@ -18,6 +20,23 @@ public class RegisterRequest {
 
     public RegisterRequest() {
 
+    }
+
+    public void sanitize() {
+        this.name = sanitizeInput(this.name);
+        this.email = sanitizeInput(this.email);
+        this.password = sanitizeInput(this.password);
+    }
+
+    // Utilize JSoup to sanitize and remove dangerous input
+    private String sanitizeInput(String input) {
+        if (input != null && !input.trim().isEmpty()) {
+            // Sanitize input
+            String sanitizedInput = Jsoup.clean(input, Safelist.basic());
+            // Return sanitized input if it's valid, else return (es. "Anonymous")
+            return sanitizedInput.isEmpty() ? "Anonymous" : sanitizedInput;
+        }
+        return "Anonymous";
     }
 
     public @NotBlank(message = "Name cannot be empty") String getName() {
