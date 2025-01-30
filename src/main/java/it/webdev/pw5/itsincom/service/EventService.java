@@ -25,6 +25,8 @@ public class EventService {
     AuthService authService;
     @Inject
     EventRepository eventRepo;
+    @Inject
+    UserService userService;
 
     public PagedListResponse<EventResponse> getAllEvents(int page, int size) {
         try {
@@ -78,7 +80,7 @@ public class EventService {
 
     public void addEvent(String token, Event event) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
 
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to create events");
@@ -93,7 +95,7 @@ public class EventService {
 
     public void updateEvent(String token, ObjectId id, Event event) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
 
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to update events");
@@ -113,8 +115,8 @@ public class EventService {
 
     public void deleteEvent(String token, ObjectId id) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
-
+        User user = userService.getUserById(userId);
+        
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to delete events");
         }
