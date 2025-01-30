@@ -19,13 +19,14 @@ public class AuthRepository implements PanacheMongoRepository<User> {
     }
 
     // Find a user by email
-    public User findByEmail(String email) {
+    // TODO: spostare in userRepository?
+    public User findUserByEmail(String email) {
         return find("email", email).firstResult();
     }
 
     // Check if the credentials while logging in inserted are correct
-    public ObjectId checkCredentials(LoginRequest req){
-        User u = find("email", req.getEmail()).firstResult();
+    public ObjectId checkCredentials(String email, String password){
+        User u = find("email", email).firstResult();
 
         // Check if the user exists
         if (u == null) {
@@ -33,7 +34,7 @@ public class AuthRepository implements PanacheMongoRepository<User> {
         }
 
         // Check if the hashed psw is correct
-        if (hashPassword(req.getPassword()).equals(u.getPassword())) {
+        if (hashPassword(password).equals(u.getPassword())) {
             return u.getId();
         } else {
             return null;

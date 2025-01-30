@@ -3,8 +3,10 @@ package it.webdev.pw5.itsincom.service;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 
 
@@ -18,20 +20,24 @@ public class SessionService {
         return sessionRepository.createAndPersistSession(userId);
     }
 
-    public ObjectId findUserByToken(String token) {
-        return sessionRepository.findUtenteByToken(token);
+    public ObjectId findUserByToken(String token) throws SessionNotFound {
+        return sessionRepository.findUserByToken(token);
     }
 
     public void deleteSession(String token) throws SessionNotFound {
-        Session s = sessionRepository.findSessionByCookie(token);
-        sessionRepository.deleteSession(s);
+        try{
+            Session s = sessionRepository.findSessionByCookie(token);
+            sessionRepository.deleteSession(s);
+        }catch (Exception e){
+            throw new SessionNotFound();
+        }
     }
 
-    public boolean checkSession(String token) {
-        return sessionRepository.checkSession(token);
+    public void checkSession(String token) throws SessionNotFound {
+        sessionRepository.findSessionByCookie(token);
     }
 
-    public ObjectId validateSession(String token) {
+    public ObjectId validateSession(String token) throws SessionNotFound {
         if (token == null || token.isEmpty()) {
             throw new SecurityException("Missing session token");
         }

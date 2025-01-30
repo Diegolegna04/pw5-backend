@@ -3,7 +3,11 @@ package it.webdev.pw5.itsincom.rest;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
+import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.EventService;
+import it.webdev.pw5.itsincom.service.SessionService;
+import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -29,6 +33,7 @@ public class EventResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response getEventById(@PathParam("id") ObjectId id) {
         Event event = eventService.getEventById(id);
         return Response.ok(event).build();
@@ -38,7 +43,7 @@ public class EventResource {
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addEvent(@CookieParam("SESSION_COOKIE") String token, Event event) {
+    public Response addEvent(@CookieParam("SESSION_COOKIE") String token, Event event) throws UserNotFound, SessionNotFound {
         eventService.addEvent(token, event);
         return Response.ok("Event created successfully").build();
     }
@@ -47,7 +52,7 @@ public class EventResource {
     @Path("/update/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id, Event event) {
+    public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id, Event event) throws UserNotFound, SessionNotFound {
         eventService.updateEvent(token, id, event);
         return Response.ok("Event updated successfully").build();
     }
@@ -55,7 +60,8 @@ public class EventResource {
     @DELETE
     @Path("/delete/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, SessionNotFound {
         eventService.deleteEvent(token, id);
         return Response.ok("Event deleted successfully").build();
     }

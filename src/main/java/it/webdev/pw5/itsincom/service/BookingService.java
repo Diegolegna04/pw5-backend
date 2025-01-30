@@ -7,6 +7,8 @@ import it.webdev.pw5.itsincom.percistence.repository.BookingRepository;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
 import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
+import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
@@ -44,9 +46,9 @@ public class BookingService {
         }
     }
 
-    public void createBooking(String token, Booking booking) {
+    public void createBooking(String token, Booking booking) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
         try {
             if (booking.getEventId() == null) {
                 throw new IllegalArgumentException("EventId is required");
@@ -100,9 +102,9 @@ public class BookingService {
         }
     }
 
-    public void acceptBooking(String token, ObjectId bookingId) {
+    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to create events");
         }
@@ -114,9 +116,9 @@ public class BookingService {
         }
     }
 
-    public void cancelBooking(String token, ObjectId bookingId) {
+    public void cancelBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to cancel events");
         }

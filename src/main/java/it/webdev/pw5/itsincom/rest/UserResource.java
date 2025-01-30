@@ -4,6 +4,8 @@ import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.UserService;
+import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -23,7 +25,7 @@ public class UserResource {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllUsers(@CookieParam("SESSION_COOKIE") String token) {
+    public Response getAllUsers(@CookieParam("SESSION_COOKIE") String token) throws UserNotFound, SessionNotFound {
         if (token == null || token.isEmpty()) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("Missing session token").build();
@@ -36,7 +38,7 @@ public class UserResource {
                     .entity("Invalid session token").build();
         }
 
-        User u = authService.findById(userId);
+        User u = authService.findUserById(userId);
 
         if (u == null || u.getRole() != User.Role.ADMIN) {
             return Response.status(Response.Status.UNAUTHORIZED)

@@ -19,6 +19,7 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,9 +37,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void registerUser(RegisterRequest req) throws EmailNotAvailable{
+    public void registerUser(RegisterRequest req) throws EmailNotAvailable {
         // Check if the inserted email is already present in DB
-        if (authRepository.findByEmail(req.getEmail()) != null) {
+        if (authRepository.findUserByEmail(req.getEmail()) != null) {
             throw new EmailNotAvailable();
         }
 
@@ -54,80 +55,39 @@ public class AuthService {
     }
 
     @Transactional
-    public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, LoginNotPossible {
+    public Session loginUser(LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {
         // Check if the inserted email exists in DB
-        User user = authRepository.findByEmail(req.getEmail());
+        // TODO: spostare in userRepository?
+        User user = authRepository.findUserByEmail(req.getEmail());
         if (user == null) {
             throw new WrongEmailOrPassword();
         }
-
         // Check credentials and get the userId (necessary for creating his session)
-        ObjectId userId = authRepository.checkCredentials(req);
+        ObjectId userId = authRepository.checkCredentials(req.getEmail(), req.getPassword());
         if (userId == null) {
             throw new WrongEmailOrPassword();
         }
-
-        // TODO: se l'utente elimina il cookie ma ha la sessione attiva bisogna reimpostarlo?
         // Check if the user already has a session
         Session existingSession = sessionRepository.findSessionByUserId(userId);
+        // If user already has a session delete it and then create a new one
         if (existingSession != null) {
-            throw new LoginNotPossible();
+            sessionService.deleteSession(existingSession.getToken());
         }
-
         return sessionService.createAndPersistSession(userId);
     }
 
     @Transactional
-    public void logoutUser(String sessionCookie) throws SessionNotFound {
-        sessionService.deleteSession(sessionCookie);
+    public void logoutUser(String token) throws SessionNotFound {
+        sessionService.deleteSession(token);
     }
 
 
-    // Check if any of the fields in both LoginRequest and RegisterRequest are empty
-    public void checkEmptyFields(Object req) throws EmptyField {
-        if (req instanceof LoginRequest loginReq) {
-            if (loginReq.getEmail() == null || loginReq.getEmail().trim().isEmpty()) {
-                throw new EmptyField();
-            }
-            if (loginReq.getPassword() == null || loginReq.getPassword().trim().isEmpty()) {
-                throw new EmptyField();
-            }
-        } else if (req instanceof RegisterRequest registerReq) {
-            if (registerReq.getEmail() == null || registerReq.getEmail().trim().isEmpty()) {
-                throw new EmptyField();
-            }
-            if (registerReq.getPassword() == null || registerReq.getPassword().trim().isEmpty()) {
-                throw new EmptyField();
-            }
-            if (registerReq.getName() == null || registerReq.getName().trim().isEmpty()) {
-                throw new EmptyField();
-            }
-        } else {
-            throw new IllegalArgumentException("Request type is not supported");
+    // TODO: spostare in userRepository?
+    public User findUserById(ObjectId userId) throws UserNotFound {
+        User u = authRepository.findById(userId);
+        if (u == null) {
+            throw new UserNotFound();
         }
-    }
-
-    public void checkEmailFormat(Object req) throws InvalidEmailFormat {
-        String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        if (req instanceof LoginRequest loginReq) {
-            Pattern pattern = Pattern.compile(EMAIL_REGEX);
-            Matcher matcher = pattern.matcher(loginReq.getEmail());
-            if (!matcher.matches()){
-                throw new InvalidEmailFormat();
-            }
-        } else if (req instanceof RegisterRequest registerReq) {
-            Pattern pattern = Pattern.compile(EMAIL_REGEX);
-            Matcher matcher = pattern.matcher(registerReq.getEmail());
-            if (!matcher.matches()){
-                throw new InvalidEmailFormat();
-            }
-        } else {
-            throw new IllegalArgumentException("Request type is not supported");
-        }
-    }
-
-    // TODO: sposta in userRepository
-    public User findById(ObjectId userId) {
-        return authRepository.findById(userId);
+        return u;
     }
 }

@@ -6,6 +6,8 @@ import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
 import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
+import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
@@ -74,9 +76,9 @@ public class EventService {
         return event;
     }
 
-    public void addEvent(String token, Event event) {
+    public void addEvent(String token, Event event) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
 
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to create events");
@@ -89,9 +91,9 @@ public class EventService {
         event.persist();
     }
 
-    public void updateEvent(String token, ObjectId id, Event event) {
+    public void updateEvent(String token, ObjectId id, Event event) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
 
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to update events");
@@ -109,9 +111,9 @@ public class EventService {
         existingEvent.persist();
     }
 
-    public void deleteEvent(String token, ObjectId id) {
+    public void deleteEvent(String token, ObjectId id) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findById(userId);
+        User user = authService.findUserById(userId);
 
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to delete events");

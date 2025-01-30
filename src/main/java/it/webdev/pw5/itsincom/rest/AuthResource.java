@@ -8,6 +8,7 @@ import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
@@ -15,149 +16,67 @@ import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
 @Path("/api/auth")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
 
     @Inject
     AuthService authService;
+    @Inject
     SessionService sessionService;
 
 
     @Path("/register")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response registerUser(RegisterRequest req) throws EmailNotAvailable, EmptyField, InvalidEmailFormat {
-        try{
-            authService.checkEmailFormat(req);
-            authService.checkEmptyFields(req);
-        } catch (InvalidEmailFormat e){
-            throw new InvalidEmailFormat();
-        } catch (EmptyField e){
-            throw new EmptyField();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
-        }
-
-        try {
-            //TODO: aggiungere di default il role user e aggiungere la possibilità di insermipento P.IVA e settare HOSTING_COMPANY
-            authService.registerUser(req);
-            return Response.ok().entity("Registration completed successfully").build();
-        } catch (EmailNotAvailable e) {
-            throw new EmailNotAvailable();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
-        }
+    public Response registerUser(@Valid RegisterRequest req) throws EmailNotAvailable {
+        authService.registerUser(req);
+        return Response.ok().entity("Registration completed successfully").build();
     }
 
     @Path("/login")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response login(LoginRequest req) throws EmptyField, LoginNotPossible, WrongEmailOrPassword, InvalidEmailFormat {
-        try{
-            authService.checkEmailFormat(req);
-            authService.checkEmptyFields(req);
-        } catch (InvalidEmailFormat e){
-            throw new InvalidEmailFormat();
-        } catch (EmptyField e){
-            throw new EmptyField();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
-        }
-
-        try{
-            Session s = authService.loginUser(req);
-            return Response.ok("Login succeeded").
-                    cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
-                    .build();
-        } catch (WrongEmailOrPassword e) {
-            throw new WrongEmailOrPassword();
-        } catch (LoginNotPossible e) {
-            throw new LoginNotPossible();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error: " + e.getMessage()).build();
-        }
+    public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound {
+        Session s = authService.loginUser(req);
+        return Response.ok("Login succeeded").
+                cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
+                .build();
     }
 
     @Path("/check-session")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response checkSession(@CookieParam("SESSION_COOKIE") String token) {
-        // Verifica se il token è presente e non vuoto
+    public Response checkIfUserHasActiveSession(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound {
         if (token == null || token.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Session token is missing or empty").build();
+            throw new CookieIsNull();
         }
-
-        // Verifica la validità della sessione
-        try {
-            boolean isValid = sessionService.checkSession(token);
-            if (isValid) {
-                return Response.ok()
-                        .entity("Session is valid").build();
-            } else {
-                return Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("Session is invalid or expired").build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("An unexpected error occurred while verifying the session").build();
-        }
+        sessionService.checkSession(token);
+        return Response.ok().entity("Session is valid").build();
     }
 
 
-    @Path("/check-category")
+    @Path("/check-role")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response checkCategory(@CookieParam("SESSION_COOKIE") String token) {
-        if (token != null || token.isEmpty()) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Missing session token").build();
+    public Response checkUserRole(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound, UserNotFound {
+        if (token == null || token.isBlank()) {
+            throw new CookieIsNull();
         }
-
-        try {
-            ObjectId userId = sessionService.findUserByToken(token);
-            if (userId == null) {
-                return Response.status(Response.Status.UNAUTHORIZED)
-                        .entity("Invalid or expired session token").build();
-            }
-
-            User user = authService.findById(userId);
-            if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("User not found").build();
-            }
-
-            return Response.ok().entity(user.getRole()).build();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("An unexpected error occurred while verifying the session").build();
-        }
+        ObjectId userId = sessionService.findUserByToken(token);
+        User user = authService.findUserById(userId);
+        return Response.ok().entity(user.getRole()).build();
     }
 
     @DELETE
     @Path("/logout")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response logoutUser(@CookieParam("SESSION_COOKIE") String sessionCookie) throws SessionNotFound {
-        try {
-            if (sessionCookie == null) {
-                throw new IllegalArgumentException("Session cookie is empty");
-            }
-            authService.logoutUser(sessionCookie);
-            NewCookie newCookie = new NewCookie.Builder("SESSION_COOKIE").value("")
-                    .path("/")
-                    .maxAge(0)
-                    .httpOnly(true)
-                    .secure(false)
-                    .build();
-            return Response.ok().cookie(newCookie).build();
-        } catch (Exception e) {
-            throw new SessionNotFound();
+    public Response logoutUser(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound {
+        if (token == null || token.isBlank()) {
+            throw new CookieIsNull();
         }
+        authService.logoutUser(token);
+        NewCookie newCookie = new NewCookie.Builder("SESSION_COOKIE").value("")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(false)
+                .build();
+        return Response.ok().cookie(newCookie).build();
     }
 }

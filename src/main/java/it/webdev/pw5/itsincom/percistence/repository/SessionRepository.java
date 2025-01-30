@@ -25,44 +25,27 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
     }
 
     public void deleteSession(Session s) {
-        if (s == null) {
-            throw new IllegalArgumentException("Session cannot be null");    // TODO: crea una nuova eccezione
-        }
-
         delete(s);
     }
 
-    public ObjectId findUtenteByToken(String token) {
+    public ObjectId findUserByToken(String token) throws SessionNotFound {
         Session s = find("token", token).firstResult();
-        if (s != null) {
-            return s.getUserId();
-        }
-        return null;
-
-    }
-
-    public boolean checkSession(String tooken) {
-        Session s = find("token", tooken).firstResult();
-        if (s != null) {
-            return true;
-        }
-        return false;
-    }
-
-    public Session findSessionByCookie(String sessionCookie) throws SessionNotFound {
-        try {
-            return find("token", sessionCookie).firstResult();
-        } catch (Exception e) {
+        if (s == null) {
             throw new SessionNotFound();
         }
+        return s.getUserId();
     }
 
-    public Session findSessionByUserId(ObjectId userId) throws LoginNotPossible {
-        try {
-            return find("userId", userId).firstResult();
-        } catch (Exception e) {
-            throw new LoginNotPossible();
+    public Session findSessionByCookie(String token) throws SessionNotFound {
+        Session session = find("token", token).firstResult();
+        if (session == null) {
+            throw new SessionNotFound();
         }
+        return session;
+    }
+
+    public Session findSessionByUserId(ObjectId userId) throws SessionNotFound {
+        return find("userId", userId).firstResult();
     }
 
 
