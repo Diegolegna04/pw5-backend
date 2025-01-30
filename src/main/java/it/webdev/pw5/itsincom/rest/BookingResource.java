@@ -66,8 +66,6 @@ public class BookingResource {
             return Response.ok().entity("booking accepted").build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to accept booking").build();
         }
     }
 
@@ -81,8 +79,6 @@ public class BookingResource {
             return Response.ok().entity("booking canceled").build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to cancel booking").build();
         }
     }
 }

@@ -111,7 +111,7 @@ public class BookingService {
         try {
             bookingRepository.acceptBooking(bookingId);
         } catch (Exception e) {
-            System.err.println("An unexpected error occurred while accepting booking: " + e.getMessage());
+            System.err.println("An error occurred while accepting booking: " + e.getMessage());
             throw new RuntimeException("Failed to accept booking", e);
         }
     }
@@ -125,7 +125,7 @@ public class BookingService {
         try {
             bookingRepository.cancelBooking(bookingId);
         } catch (Exception e) {
-            System.err.println("An unexpected error occurred while canceling booking: " + e.getMessage());
+            System.err.println("An error occurred while canceling booking: " + e.getMessage());
             throw new RuntimeException("Failed to cancel booking", e);
         }
     }
