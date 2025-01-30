@@ -14,7 +14,6 @@ import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class BookingService {
@@ -25,7 +24,7 @@ public class BookingService {
     UserRepository userRepository;
 
     @Inject
-    AuthService authService;
+    UserService userService;
 
     @Inject
     SessionService sessionService;
@@ -48,7 +47,7 @@ public class BookingService {
 
     public void createBooking(String token, Booking booking) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
         try {
             if (booking.getEventId() == null) {
                 throw new IllegalArgumentException("EventId is required");
@@ -104,7 +103,7 @@ public class BookingService {
 
     public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to create events");
         }
@@ -118,7 +117,7 @@ public class BookingService {
 
     public void cancelBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound {
         ObjectId userId = sessionService.validateSession(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new SecurityException("You do not have permission to cancel events");
         }

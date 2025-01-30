@@ -19,8 +19,6 @@ public class UserResource {
     SessionService sessionService;
     @Inject
     UserService userService;
-    @Inject
-    AuthService authService;
 
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
@@ -38,7 +36,7 @@ public class UserResource {
                     .entity("Invalid session token").build();
         }
 
-        User u = authService.findUserById(userId);
+        User u = userService.getUserById(userId);
 
         if (u == null || u.getRole() != User.Role.ADMIN) {
             return Response.status(Response.Status.UNAUTHORIZED)

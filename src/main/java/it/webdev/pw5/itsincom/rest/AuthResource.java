@@ -6,6 +6,7 @@ import it.webdev.pw5.itsincom.rest.model.LoginRequest;
 import it.webdev.pw5.itsincom.rest.model.RegisterRequest;
 import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
+import it.webdev.pw5.itsincom.service.UserService;
 import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -24,6 +25,8 @@ public class AuthResource {
     AuthService authService;
     @Inject
     SessionService sessionService;
+    @Inject
+    UserService userService;
 
 
     @Path("/register")
@@ -67,7 +70,7 @@ public class AuthResource {
             throw new CookieIsNull();
         }
         ObjectId userId = sessionService.findUserByToken(token);
-        User user = authService.findUserById(userId);
+        User user = userService.getUserById(userId);
         return Response.ok().entity(user.getRole()).build();
     }
 

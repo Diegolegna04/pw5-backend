@@ -92,14 +92,4 @@ public class AuthService {
     public void logoutUser(String token) throws SessionNotFound {
         sessionService.deleteSession(token);
     }
-
-
-    // TODO: spostare in userRepository?
-    public User findUserById(ObjectId userId) throws UserNotFound {
-        User u = authRepository.findById(userId);
-        if (u == null) {
-            throw new UserNotFound();
-        }
-        return u;
-    }
 }
