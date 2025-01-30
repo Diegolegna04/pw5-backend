@@ -91,7 +91,7 @@ public class BookingService {
         }
     }
 
-    public List<BookingResponse> findBookingsByUserId(int userId) {
+    public List<BookingResponse> findBookingsByUserId(ObjectId userId) {
         try {
             return bookingRepository.findBookingsByUserId(userId).stream().map(this::toBookingResponse).toList();
         } catch (Exception e) {

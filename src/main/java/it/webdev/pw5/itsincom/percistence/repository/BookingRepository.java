@@ -38,8 +38,8 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
         return findById(id);
     }
 
-    public List<Booking> findBookingsByUserId(int userId) {
-        return list("id_utente", userId);
+    public List<Booking> findBookingsByUserId(ObjectId userId) {
+        return list("userId", userId);
     }
 
     public void acceptBooking(ObjectId bookingId) {
