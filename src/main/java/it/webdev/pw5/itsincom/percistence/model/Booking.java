@@ -13,6 +13,7 @@ public class Booking {
     private String name;
     private Status status;
     private Date eventDate;
+    private String title;
 
     public enum Status {
         PENDING, ACCEPTED, REJECTED
@@ -67,5 +68,13 @@ public class Booking {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

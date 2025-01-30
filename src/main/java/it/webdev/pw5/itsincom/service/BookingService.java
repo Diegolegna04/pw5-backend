@@ -130,10 +130,9 @@ public class BookingService {
 
     public BookingResponse toBookingResponse(Booking booking) {
         BookingResponse response = new BookingResponse();
-        response.setName(booking.getName());
         response.setEventDate(booking.getEventDate());
+        response.setTitle(booking.getTitle());
         response.setStatus(booking.getStatus());
-
         return response;
     }
 }

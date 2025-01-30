@@ -28,6 +28,7 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
     }
 
     public void saveBooking(Booking booking) {
+        booking.setTitle(eventRepository.findEventById(booking.getEventId()).getTitle());
         booking.setName(userRepository.findUserById(booking.getUserId()).getName());
         booking.setStatus(Booking.Status.PENDING);
         booking.setEventDate(getEventDate(booking));
