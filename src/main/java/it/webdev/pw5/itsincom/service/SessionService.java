@@ -3,10 +3,8 @@ package it.webdev.pw5.itsincom.service;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
-import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 
 
@@ -20,10 +18,6 @@ public class SessionService {
         return sessionRepository.createAndPersistSession(userId);
     }
 
-    public ObjectId findUserByToken(String token) throws SessionNotFound {
-        return sessionRepository.findUserByToken(token);
-    }
-
     public void deleteSession(String token) throws SessionNotFound {
         try{
             Session s = sessionRepository.findSessionByCookie(token);
@@ -35,17 +29,5 @@ public class SessionService {
 
     public void checkSession(String token) throws SessionNotFound {
         sessionRepository.findSessionByCookie(token);
-    }
-
-    public ObjectId validateSession(String token) throws SessionNotFound {
-        if (token == null || token.isEmpty()) {
-            throw new SecurityException("Missing session token");
-        }
-
-        ObjectId userId = findUserByToken(token);
-        if (userId == null) {
-            throw new SecurityException("Invalid or expired session token");
-        }
-        return userId;
     }
 }

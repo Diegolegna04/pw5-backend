@@ -31,7 +31,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
             case "LoginNotPossible" -> "A session is already active for this user. Please log out before trying again.";
             case "SessionNotFound" -> "Session not found.";
             case "InvalidEmailFormat" -> "Email format is invalid.";
-            case "CookieIsNull" -> "Cookie is null.";
+            case "SessionCookieIsNull" -> "Session cookie is null.";
             case "UserNotFound" -> "User not found.";
             case "UserUnauthorized" -> "User is not authorized to perform this action.";
             case "UserIsNotVerified" -> "User must verify his email before proceeding.";
@@ -43,7 +43,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
     private Response.Status getStatusCode(Exception e) {
         return switch (e.getClass().getSimpleName()) {
             case "EmailNotAvailable", "LoginNotPossible" -> Response.Status.CONFLICT;
-            case "EmptyField", "InvalidEmailFormat", "CookieIsNull", "XSSAttackAttempt" -> Response.Status.BAD_REQUEST;
+            case "EmptyField", "InvalidEmailFormat", "SessionCookieIsNull", "XSSAttackAttempt" -> Response.Status.BAD_REQUEST;
             case "WrongEmailOrPassword", "UserUnauthorized", "UserIsNotVerified" -> Response.Status.UNAUTHORIZED;
             case "SessionNotFound", "UserNotFound" -> Response.Status.NOT_FOUND;
             default -> Response.Status.INTERNAL_SERVER_ERROR;

@@ -14,7 +14,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import org.bson.types.ObjectId;
+
 
 @Path("/api/auth")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,7 +27,6 @@ public class AuthResource {
     SessionService sessionService;
     @Inject
     UserService userService;
-
 
     @Path("/register")
     @POST
@@ -56,9 +55,9 @@ public class AuthResource {
 
     @Path("/check-session")
     @GET
-    public Response checkIfUserHasActiveSession(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound {
+    public Response checkIfUserHasActiveSession(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound {
         if (token == null || token.isBlank()) {
-            throw new CookieIsNull();
+            throw new SessionCookieIsNull();
         }
         sessionService.checkSession(token);
         return Response.ok().entity("{\"message\": \"Session is valid\"}").build();
@@ -66,20 +65,19 @@ public class AuthResource {
 
     @Path("/check-role")
     @GET
-    public Response checkUserRole(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound, UserNotFound {
+    public Response checkUserRole(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound, UserNotFound {
         if (token == null || token.isBlank()) {
-            throw new CookieIsNull();
+            throw new SessionCookieIsNull();
         }
-        ObjectId userId = sessionService.findUserByToken(token);
-        User user = userService.getUserById(userId);
+        User user = userService.findUserByToken(token);
         return Response.ok().entity(user.getRole()).build();
     }
 
     @DELETE
     @Path("/logout")
-    public Response logoutUser(@CookieParam("SESSION_COOKIE") String token) throws CookieIsNull, SessionNotFound {
+    public Response logoutUser(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound {
         if (token == null || token.isBlank()) {
-            throw new CookieIsNull();
+            throw new SessionCookieIsNull();
         }
         authService.logoutUser(token);
         NewCookie newCookie = new NewCookie.Builder("SESSION_COOKIE").value("")

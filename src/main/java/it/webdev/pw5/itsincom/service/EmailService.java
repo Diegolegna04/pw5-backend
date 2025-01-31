@@ -6,6 +6,7 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+
 @ApplicationScoped
 public class EmailService {
 

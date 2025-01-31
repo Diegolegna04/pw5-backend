@@ -5,19 +5,17 @@ import it.webdev.pw5.itsincom.percistence.model.Booking;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-
 import java.util.Date;
 import java.util.List;
+
 
 @ApplicationScoped
 public class BookingRepository implements PanacheMongoRepositoryBase<Booking, ObjectId> {
 
     @Inject
     EventRepository eventRepository;
-
     @Inject
     UserRepository userRepository;
-
 
     public List<Booking> getAllBookings() {
         return listAll();

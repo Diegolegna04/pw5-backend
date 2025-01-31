@@ -8,20 +8,18 @@ import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @ApplicationScoped
 public class EventService {
 
-    @Inject
-    SessionService sessionService;
     @Inject
     EventRepository eventRepository;
     @Inject
@@ -77,27 +75,21 @@ public class EventService {
         return event;
     }
 
-    public void addEvent(String token, Event event) throws UserNotFound, SessionNotFound {
-        ObjectId userId = sessionService.validateSession(token);
-        User user = userService.getUserById(userId);
-
+    public void addEvent(String token, Event event) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
-            throw new SecurityException("You do not have permission to create events");
+            throw new UserUnauthorized();
         }
-
         if (event == null || event.getTitle() == null || event.getDate() == null) {
-            throw new IllegalArgumentException("Invalid event data");
+            throw new IllegalArgumentException("The event in input is invalid");
         }
-
         event.persist();
     }
 
-    public void updateEvent(String token, ObjectId id, Event event) throws UserNotFound, SessionNotFound {
-        ObjectId userId = sessionService.validateSession(token);
-        User user = userService.getUserById(userId);
-
+    public void updateEvent(String token, ObjectId id, Event event) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
-            throw new SecurityException("You do not have permission to update events");
+            throw new UserUnauthorized();
         }
 
         Event existingEvent = getEventById(id);
@@ -112,12 +104,10 @@ public class EventService {
         existingEvent.persist();
     }
 
-    public void deleteEvent(String token, ObjectId id) throws UserNotFound, SessionNotFound {
-        ObjectId userId = sessionService.validateSession(token);
-        User user = userService.getUserById(userId);
-        
+    public void deleteEvent(String token, ObjectId id) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
-            throw new SecurityException("You do not have permission to delete events");
+            throw new UserUnauthorized();
         }
 
         Event event = getEventById(id);

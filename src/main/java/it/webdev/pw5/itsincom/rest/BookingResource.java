@@ -6,6 +6,7 @@ import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.service.BookingService;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
+import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -47,40 +48,26 @@ public class BookingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createBooking(@CookieParam("SESSION_COOKIE") String token, Booking booking) {
-        try {
-            bookingService.createBooking(token, booking);
-            return Response.ok(booking).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Failed to create booking").build();
-        }
+    public Response createBooking(@CookieParam("SESSION_COOKIE") String token, Booking booking) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        bookingService.createBooking(token, booking);
+        return Response.ok(booking).build();
     }
 
     @PUT
     @Path("/accept/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
-        try {
-            bookingService.acceptBooking(token, id);
-            return Response.ok().entity("booking accepted").build();
-        } catch (IllegalArgumentException | UserNotFound | SessionNotFound e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        }
+    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound {
+        bookingService.acceptBooking(token, id);
+        return Response.ok().entity("booking accepted").build();
     }
 
     @PUT
     @Path("/cancel/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) {
-        try {
-            bookingService.cancelBooking(token, id);
-            return Response.ok().entity("booking canceled").build();
-        } catch (IllegalArgumentException | UserNotFound | SessionNotFound e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-        }
+    public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound {
+        bookingService.cancelBooking(token, id);
+        return Response.ok().entity("booking canceled").build();
     }
 }
