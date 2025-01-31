@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 
+import java.util.Collections;
+
 @Path("/api/auth")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -70,7 +72,7 @@ public class AuthResource {
             throw new SessionCookieIsNull();
         }
         User user = userService.findUserByToken(token);
-        return Response.ok().entity(user.getRole()).build();
+        return Response.ok().entity(Collections.singletonMap("role", user.getRole().name())).build();
     }
 
     @DELETE
