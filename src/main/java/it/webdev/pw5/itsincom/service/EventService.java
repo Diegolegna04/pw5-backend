@@ -124,17 +124,6 @@ public class EventService {
         event.delete();
     }
 
-    private EventResponse toEventResponse(Event event) {
-        EventResponse response = new EventResponse();
-        response.setId(event.getId().toString());
-        response.setDate(event.getDate());
-        response.setType(event.getType());
-        response.setTitle(event.getTitle());
-        response.setLocation(event.getLocation());
-        response.setParticipantCount(event.getParticipants().size());
-        return response;
-    }
-
     public PagedListResponse<EventResponse> filterEventsByYear(int year, int page, int size) {
         try {
             if (page < 1 || size < 1) {
@@ -163,4 +152,15 @@ public class EventService {
         }
     }
 
+
+    private EventResponse toEventResponse(Event event) {
+        EventResponse response = new EventResponse();
+        response.setId(event.getId().toString());
+        response.setDate(event.getDate());
+        response.setType(event.getType());
+        response.setTitle(event.getTitle());
+        response.setLocation(event.getLocation());
+        response.setParticipantCount(event.getParticipants().size());
+        return response;
+    }
 }

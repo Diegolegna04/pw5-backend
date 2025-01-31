@@ -34,14 +34,14 @@ public class AuthResource {
     public Response registerUser(@Valid RegisterRequest req) throws EmailNotAvailable, XSSAttackAttempt {
         req.sanitize();
         authService.registerUser(req);
-        return Response.ok().entity("Registration completed successfully").build();
+        return Response.ok().entity("{\"message\": \"Registration completed successfully\"}").build();
     }
 
     @GET
     @Path("/verify")
     public Response verifyEmail(@QueryParam("token") String emailVerificationToken) throws UserNotFound {
         authService.verifyEmail(emailVerificationToken);
-        return Response.ok().entity("Email verified").build();
+        return Response.ok().entity("{\"message\": \"Email verified successfully\"}").build();
     }
 
     @Path("/login")
@@ -49,8 +49,8 @@ public class AuthResource {
     public Response login(@Valid LoginRequest req) throws WrongEmailOrPassword, SessionNotFound, UserIsNotVerified, XSSAttackAttempt {
         req.sanitize();
         Session s = authService.loginUser(req);
-        return Response.ok("Login succeeded").
-                cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
+        return Response.ok().entity("{\"message\": \"Login succeeded\"}")
+                .cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
                 .build();
     }
 
@@ -61,7 +61,7 @@ public class AuthResource {
             throw new CookieIsNull();
         }
         sessionService.checkSession(token);
-        return Response.ok().entity("Session is valid").build();
+        return Response.ok().entity("{\"message\": \"Session is valid\"}").build();
     }
 
     @Path("/check-role")
@@ -88,6 +88,6 @@ public class AuthResource {
                 .httpOnly(true)
                 .secure(false)
                 .build();
-        return Response.ok().entity("Logout succeeded").cookie(newCookie).build();
+        return Response.ok().entity("{\"message\": \"Logout succeeded\"}").cookie(newCookie).build();
     }
 }
