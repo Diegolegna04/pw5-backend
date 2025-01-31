@@ -12,6 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +23,7 @@ public class EventService {
     @Inject
     SessionService sessionService;
     @Inject
-    AuthService authService;
-    @Inject
-    EventRepository eventRepo;
+    EventRepository eventRepository;
     @Inject
     UserService userService;
 
@@ -38,7 +37,7 @@ public class EventService {
             Date currentDate = new Date();
 
             // Recupera gli eventi e assegna il filtro UPCOMING/PAST
-            List<EventResponse> eventResponses = eventRepo.findAll(Sort.by("date").descending())
+            List<EventResponse> eventResponses = eventRepository.findAll(Sort.by("date").descending())
                     .page(page - 1, size)
                     .list()
                     .stream()
@@ -56,7 +55,7 @@ public class EventService {
                     })
                     .collect(Collectors.toList());
 
-            long totalCount = eventRepo.count();
+            long totalCount = eventRepository.count();
             int totalPages = (int) Math.ceil((double) totalCount / size);
 
             return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
@@ -71,7 +70,7 @@ public class EventService {
         if (id == null) {
             throw new IllegalArgumentException("Invalid event ID");
         }
-        Event event = eventRepo.findById(id);
+        Event event = eventRepository.findById(id);
         if (event == null) {
             throw new IllegalArgumentException("Event not found");
         }
@@ -135,4 +134,33 @@ public class EventService {
         response.setParticipantCount(event.getParticipants().size());
         return response;
     }
+
+    public PagedListResponse<EventResponse> filterEventsByYear(int year, int page, int size) {
+        try {
+            if (page < 1 || size < 1) {
+                throw new IllegalArgumentException("Page and size must be greater than 0");
+            }
+
+            // Recupera gli eventi filtrati per anno con paginazione
+            List<Event> events = eventRepository.findAllFilteredEvents(year, page, size);
+
+            // Converte gli eventi in EventResponse
+            List<EventResponse> eventResponses = events
+                    .stream()
+                    .map(this::toEventResponse)
+                    .collect(Collectors.toList());
+
+            // Recupera il numero totale di eventi filtrati per anno
+            long totalCount = eventRepository.countFilteredEventsByYear(year);
+
+            // Calcola il numero totale di pagine
+            int totalPages = (int) Math.ceil((double) totalCount / size);
+
+            return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred while fetching events: " + e.getMessage());
+            throw new RuntimeException("Failed to fetch events", e);
+        }
+    }
+
 }

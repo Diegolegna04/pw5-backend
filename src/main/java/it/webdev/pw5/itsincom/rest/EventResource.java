@@ -3,9 +3,7 @@ package it.webdev.pw5.itsincom.rest;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
-import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.EventService;
-import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import jakarta.inject.Inject;
@@ -14,7 +12,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
-import java.util.List;
 
 @Path("/api/events")
 public class EventResource {
@@ -64,5 +61,17 @@ public class EventResource {
     public Response deleteEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, SessionNotFound {
         eventService.deleteEvent(token, id);
         return Response.ok("Event deleted successfully").build();
+    }
+
+    // FILTERS
+    // By Year
+    @GET
+    @Path("/filter")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEventsByYear(@QueryParam("year") Integer year,
+                                    @QueryParam("page") @DefaultValue("1") int page,
+                                    @QueryParam("size") @DefaultValue("10") int size) {
+        PagedListResponse<EventResponse> response = eventService.filterEventsByYear(year, page, size);
+        return Response.ok(response).build();
     }
 }

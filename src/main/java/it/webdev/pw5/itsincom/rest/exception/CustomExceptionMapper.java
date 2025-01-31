@@ -35,7 +35,7 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
             case "UserNotFound" -> "User not found.";
             case "UserUnauthorized" -> "User is not authorized to perform this action.";
             case "UserIsNotVerified" -> "User must verify his email before proceeding.";
-            case "XSSAttackAttempt" -> "Input is invalid. Please remove every HTML tag";
+            case "XSSAttackAttempt" -> "Potential XSS attack attempt detected, input is empty";
             default -> "Unexpected error: " + e.getMessage();
         };
     }

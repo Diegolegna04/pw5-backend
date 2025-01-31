@@ -19,4 +19,16 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
         return findById(id);
     }
 
+//    public List<Event> findAllEvents() {
+//
+//    }
+
+    public List<Event> findAllFilteredEvents(int year, int page, int size) {
+        return find("year(date) = ?1", year)
+                .page(page - 1, size)
+                .list();
+    }
+    public long countFilteredEventsByYear(int year) {
+        return count("year(date) = ?1", year);
+    }
 }
