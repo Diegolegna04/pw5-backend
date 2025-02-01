@@ -26,4 +26,8 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
     public long countFilteredEventsByYear(int year) {
         return count("year(date) = ?1", year);
     }
+
+    public void updateEvent(Event event) {
+        this.persistOrUpdate(event);
+    }
 }

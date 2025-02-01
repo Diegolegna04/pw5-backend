@@ -14,6 +14,7 @@ import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -91,17 +92,28 @@ public class EventService {
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new UserUnauthorized();
         }
-
         Event existingEvent = getEventById(id);
+        if (existingEvent == null) {
+            throw new IllegalArgumentException("Event not found");
+        }
 
-        if (event.getTitle() != null) existingEvent.setTitle(event.getTitle());
-        if (event.getDate() != null) existingEvent.setDate(event.getDate());
-        if (event.getLocation() != null) existingEvent.setLocation(event.getLocation());
-        if (event.getHostingCompanies() != null) existingEvent.setHostingCompanies(event.getHostingCompanies());
-        if (event.getSpeakers() != null) existingEvent.setSpeakers(event.getSpeakers());
-        if (event.getParticipants() != null) existingEvent.setParticipants(event.getParticipants());
+        updateFieldIfNotNull(existingEvent::setTitle, event.getTitle());
+        updateFieldIfNotNull(existingEvent::setDate, event.getDate());
+        updateFieldIfNotNull(existingEvent::setLocation, event.getLocation());
+        updateFieldIfNotNull(existingEvent::setType, event.getType());
+        updateFieldIfNotNull(existingEvent::setMaxParticipants, event.getMaxParticipants());
+        updateFieldIfNotNull(existingEvent::setParticipants, event.getParticipants());
+        updateFieldIfNotNull(existingEvent::setHostingCompanies, event.getHostingCompanies());
+        updateFieldIfNotNull(existingEvent::setSpeakers, event.getSpeakers());
+        updateFieldIfNotNull(existingEvent::setFilter, event.getFilter());
 
-        existingEvent.persist();
+        eventRepository.updateEvent(existingEvent);
+    }
+
+    private <T> void updateFieldIfNotNull(Consumer<T> setter, T value) {
+        if (value != null) {
+            setter.accept(value);
+        }
     }
 
     public void deleteEvent(String token, ObjectId id) throws UserNotFound, SessionNotFound, UserUnauthorized {
