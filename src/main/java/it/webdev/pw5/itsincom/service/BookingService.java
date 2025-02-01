@@ -2,6 +2,7 @@ package it.webdev.pw5.itsincom.service;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.Event;
+import it.webdev.pw5.itsincom.percistence.model.Ticket;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.BookingRepository;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
@@ -14,6 +15,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -30,6 +32,8 @@ public class BookingService {
     EmailService emailService;
     @Inject
     EventRepository eventRepository;
+    @Inject
+    PdfService pdfService;
 
     public List<BookingResponse> getAllBookings(int page, int size) {
         return bookingRepository.findAll().page(page - 1, size)
@@ -73,12 +77,35 @@ public class BookingService {
         return bookingRepository.findBookingsByUserId(userId).stream().map(this::toBookingResponse).toList();
     }
 
-    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound, UserUnauthorized {
+
+    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
         User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new UserUnauthorized();
         }
-        bookingRepository.acceptBooking(bookingId);
+
+        Booking booking = bookingRepository.findBookingById(bookingId);
+        if (booking != null) {
+            bookingRepository.acceptBooking(bookingId);
+
+            Event event = eventRepository.findEventById(booking.getEventId());
+            String userEmail = userRepository.findUserById(booking.getUserId()).getEmail();
+
+            // Generate the ticket
+            Ticket ticket = new Ticket();
+            ticket.setTicketNumber(booking.getId().hashCode());
+            ticket.setTitle(event.getTitle());
+            ticket.setEventDate(event.getDate());
+
+            String ticketPath = pdfService.generateTicketPdf(ticket);
+            String ticketUrl = "http://localhost:8080/" + ticketPath;
+            emailService.sendBookingAccepted(
+                    userEmail,
+                    "Booking Confirmation",
+                    "Your booking has been accepted.",
+                    ticketUrl
+            );
+        }
     }
 
     public void cancelBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound, UserUnauthorized {

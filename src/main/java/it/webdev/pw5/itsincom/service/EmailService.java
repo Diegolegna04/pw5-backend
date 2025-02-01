@@ -20,4 +20,12 @@ public class EmailService {
     public void sendVerificationEmail(String email, String message) {
         mailer.send(Mail.withHtml(email, "Verifica la tua email", message));
     }
+
+    public void sendBookingAccepted(String userEmail, String bookingConfirmation, String s, String ticketUrl) {
+        mailer.send(Mail.withHtml(userEmail, "Booking accepted",
+                bookingConfirmation +
+                        "<br><a href=\"" +
+                        ticketUrl +
+                        "\">Download ticket</a>"));
+    }
 }

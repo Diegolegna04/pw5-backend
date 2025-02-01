@@ -14,6 +14,7 @@ public class Booking {
     private Status status;
     private Date eventDate;
     private String title;
+    //TODO: add LOCATION
 
     public enum Status {
         PENDING, ACCEPTED, REJECTED

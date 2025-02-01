@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
 import java.util.List;
 
 @Path("/api/bookings")
@@ -50,7 +51,7 @@ public class BookingResource {
     @Path("/accept/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound {
+    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
         bookingService.acceptBooking(token, id);
         return Response.ok().entity("booking accepted").build();
     }
