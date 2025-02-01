@@ -38,13 +38,6 @@ public class BookingResource {
         return bookingService.findBookingById(id);
     }
 
-    @GET
-    @Path("/user/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<BookingResponse> getBookingsByUserId(@PathParam("id") ObjectId userId) {
-        return bookingService.findBookingsByUserId(userId);
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

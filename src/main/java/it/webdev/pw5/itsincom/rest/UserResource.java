@@ -1,6 +1,8 @@
 package it.webdev.pw5.itsincom.rest;
 
+import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.rest.model.UserResponse;
 import it.webdev.pw5.itsincom.rest.model.UserUpdated;
 import it.webdev.pw5.itsincom.service.UserService;
@@ -29,6 +31,19 @@ public class UserResource {
         return Response.ok(users).build();
     }
 
+
+    @GET
+    @Path("/bookings")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBookingsForUser(@CookieParam("SESSION_COOKIE") String token) {
+        try {
+            List<BookingResponse> bookings = userService.getBookingsForUserByToken(token);
+            return Response.ok(bookings).build();
+        } catch (UserNotFound | SessionNotFound e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        }
+    }
+    
     @GET
     @Path("/profile")
     @Consumes(MediaType.APPLICATION_JSON)

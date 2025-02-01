@@ -1,7 +1,10 @@
 package it.webdev.pw5.itsincom.service;
 
+import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
+import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.rest.model.UserUpdated;
 import it.webdev.pw5.itsincom.service.exception.SessionCookieIsNull;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
@@ -20,6 +23,10 @@ public class UserService {
     UserRepository userRepository;
     @Inject
     HashCalculator hashCalculator;
+    @Inject
+    SessionRepository sessionRepository;
+    @Inject
+    BookingService bookingService;
 
     public List<User> getAllUsers(String token) throws SessionNotFound, UserNotFound, UserUnauthorized, SessionCookieIsNull {
         if (token == null || token.isEmpty()) {
@@ -37,6 +44,19 @@ public class UserService {
             throw new UserNotFound();
         }
         return userRepository.findUserById(id);
+    }
+
+    public List<BookingResponse> getBookingsForUserByToken(String token) throws UserNotFound, SessionNotFound {
+        ObjectId userId = sessionRepository.findUserIdByToken(token);
+        return getBookingsForUser(userId);
+    }
+
+    public List<BookingResponse> getBookingsForUser(ObjectId userId) throws UserNotFound {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new UserNotFound();
+        }
+        return bookingService.findBookingsByUserId(userId);
     }
 
     public void updateUser(String token, UserUpdated updatedUser) throws SessionNotFound, UserNotFound, SessionCookieIsNull {
