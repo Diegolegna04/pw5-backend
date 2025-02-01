@@ -1,9 +1,11 @@
 package it.webdev.pw5.itsincom.percistence.repository;
 
 import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
+import io.quarkus.panache.common.Sort;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
+
 import java.util.List;
 
 
@@ -12,6 +14,16 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
 
     public void saveEvent(Event event) {
         this.persist(event);
+    }
+
+    public List<Event> findAllEvents(int page, int size) {
+        return findAll(Sort.by("date").descending())
+                .page(page - 1, size)
+                .list();
+    }
+
+    public long countAllEvents() {
+        return count();
     }
 
     public Event findEventById(ObjectId id) {
@@ -23,6 +35,7 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
                 .page(page - 1, size)
                 .list();
     }
+
     public long countFilteredEventsByYear(int year) {
         return count("year(date) = ?1", year);
     }

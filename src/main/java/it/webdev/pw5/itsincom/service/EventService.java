@@ -12,6 +12,7 @@ import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
+
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,43 +28,29 @@ public class EventService {
     UserService userService;
 
     public PagedListResponse<EventResponse> getAllEvents(int page, int size) {
-        try {
-            if (page < 1 || size < 1) {
-                throw new IllegalArgumentException("Page and size must be greater than 0");
-            }
-
-            // Data attuale per il confronto
-            Date currentDate = new Date();
-
-            // Recupera gli eventi e assegna il filtro UPCOMING/PAST
-            List<EventResponse> eventResponses = eventRepository.findAll(Sort.by("date").descending())
-                    .page(page - 1, size)
-                    .list()
-                    .stream()
-                    .map(event -> {
-                        EventResponse response = toEventResponse(event);
-
-                        // Controllo della data
-                        if (event.getDate().before(currentDate)) {
-                            response.setFilter(EventResponse.Filter.PAST);
-                        } else {
-                            response.setFilter(EventResponse.Filter.UPCOMING);
-                        }
-
-                        return response;
-                    })
-                    .collect(Collectors.toList());
-
-            long totalCount = eventRepository.count();
-            int totalPages = (int) Math.ceil((double) totalCount / size);
-
-            return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
-        } catch (Exception e) {
-            System.err.println("An unexpected error occurred while fetching all events: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch all events", e);
+        if (page < 1 || size < 1) {
+            throw new IllegalArgumentException("Page and size must be greater than 0");
         }
-    }
 
+        Date currentDate = new Date();
+        List<Event> events = eventRepository.findAllEvents(page, size);
+        List<EventResponse> eventResponses = events.stream()
+                .map(event -> {
+                    EventResponse response = toEventResponse(event);
+                    if (event.getDate().before(currentDate)) {
+                        response.setFilter(EventResponse.Filter.PAST);
+                    } else {
+                        response.setFilter(EventResponse.Filter.UPCOMING);
+                    }
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        long totalCount = eventRepository.countAllEvents();
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
+    }
 
     public Event getEventById(ObjectId id) {
         if (id == null) {
@@ -84,7 +71,7 @@ public class EventService {
         if (event == null || event.getTitle() == null || event.getDate() == null) {
             throw new IllegalArgumentException("The event in input is invalid");
         }
-        event.persist();
+        eventRepository.saveEvent(event);
     }
 
     public void updateEvent(String token, ObjectId id, Event event) throws UserNotFound, SessionNotFound, UserUnauthorized {
@@ -164,6 +151,8 @@ public class EventService {
         response.setLocation(event.getLocation());
         response.setParticipantCount(event.getParticipants().size());
         response.setMaxParticipants(event.getMaxParticipants());
+        response.setHostingCompanies(event.getHostingCompanies());
+        response.setSpeakers(event.getSpeakers());
         return response;
     }
 }

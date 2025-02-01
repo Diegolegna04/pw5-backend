@@ -1,6 +1,9 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.percistence.model.Speaker;
+
 import java.util.Date;
+import java.util.List;
 
 public class EventResponse {
     private String id;
@@ -11,6 +14,9 @@ public class EventResponse {
     private int participantCount;
     private Filter filter;
     private Integer maxParticipants;
+    private List<String> hostingCompanies;
+    private List<Speaker> speakers;
+
 
     public enum Filter {
         UPCOMING, PAST
@@ -83,4 +89,19 @@ public class EventResponse {
         this.maxParticipants = maxParticipants;
     }
 
+    public List<String> getHostingCompanies() {
+        return hostingCompanies;
+    }
+
+    public void setHostingCompanies(List<String> hostingCompanies) {
+        this.hostingCompanies = hostingCompanies;
+    }
+
+    public List<Speaker> getSpeakers() {
+        return speakers;
+    }
+
+    public void setSpeakers(List<Speaker> speakers) {
+        this.speakers = speakers;
+    }
 }
