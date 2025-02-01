@@ -8,6 +8,7 @@ public class BookingResponse {
     private Date eventDate;
     private Booking.Status status;
     private String title;
+    private String eventId;
 
     public Date getEventDate() {
         return eventDate;
@@ -31,5 +32,13 @@ public class BookingResponse {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 }

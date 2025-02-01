@@ -121,6 +121,7 @@ public class BookingService {
         response.setEventDate(booking.getEventDate());
         response.setTitle(booking.getTitle());
         response.setStatus(booking.getStatus());
+        response.setEventId(booking.getEventId().toString());
         return response;
     }
 }
