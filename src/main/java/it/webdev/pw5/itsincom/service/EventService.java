@@ -151,6 +151,7 @@ public class EventService {
         response.setTitle(event.getTitle());
         response.setLocation(event.getLocation());
         response.setParticipantCount(event.getParticipants().size());
+        response.setMaxParticipants(event.getMaxParticipants());
         return response;
     }
 }

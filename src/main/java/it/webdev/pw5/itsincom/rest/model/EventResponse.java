@@ -10,6 +10,7 @@ public class EventResponse {
     private String location;
     private int participantCount;
     private Filter filter;
+    private Integer maxParticipants;
 
     public enum Filter {
         UPCOMING, PAST
@@ -72,6 +73,14 @@ public class EventResponse {
 
     public void setFilter(Filter filter) {
         this.filter = filter;
+    }
+
+    public Integer getMaxParticipants() {
+        return maxParticipants;
+    }
+
+    public void setMaxParticipants(Integer maxParticipants) {
+        this.maxParticipants = maxParticipants;
     }
 
 }
