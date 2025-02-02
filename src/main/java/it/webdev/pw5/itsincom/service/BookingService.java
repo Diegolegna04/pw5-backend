@@ -45,23 +45,21 @@ public class BookingService {
         if (booking.getEventId() == null) {
             throw new IllegalArgumentException("EventId is required");
         }
-        if (booking.getUserId() == null) {
-            throw new IllegalArgumentException("UserId is required");
-        }
+        booking.setUserId(user.getId()); // Set the user ID from the token
         if (!user.getRole().equals(User.Role.USER)) {
             throw new UserUnauthorized();
         }
-        if (bookingRepository.checkDoubleBooking(booking.getUserId(), booking.getEventId())) {
-            throw new IllegalArgumentException("This event has already been booked");
+        if (bookingRepository.checkDoubleBooking(user.getId(), booking.getEventId())) {
+            throw new IllegalArgumentException("This event has already been booked by the user");
         }
 
         bookingRepository.saveBooking(booking);
 
         Event event = eventRepository.findEventById(booking.getEventId());
-        event.addParticipant(booking.getUserId());
+        event.addParticipant(user.getId());
         eventRepository.persistOrUpdate(event);
 
-        String userEmail = userRepository.findUserById(booking.getUserId()).getEmail();
+        String userEmail = user.getEmail();
         emailService.sendBookingConfirmation(
                 userEmail,
                 "Booking Confirmation",
