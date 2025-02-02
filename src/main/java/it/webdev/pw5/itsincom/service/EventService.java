@@ -1,9 +1,9 @@
 package it.webdev.pw5.itsincom.service;
 
-import io.quarkus.panache.common.Sort;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
+import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
 import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-
 @ApplicationScoped
 public class EventService {
 
@@ -26,6 +25,10 @@ public class EventService {
     EventRepository eventRepository;
     @Inject
     UserService userService;
+    @Inject
+    EmailService emailService;
+    @Inject
+    UserRepository userRepository;
 
     public PagedListResponse<EventResponse> getAllEvents(int page, int size) {
         if (page < 1 || size < 1) {
@@ -84,18 +87,30 @@ public class EventService {
             throw new IllegalArgumentException("Event not found");
         }
 
+        String changesSummary = generateEventChangesSummary(existingEvent, event);
+
         updateFieldIfNotNull(existingEvent::setTitle, event.getTitle());
         updateFieldIfNotNull(existingEvent::setDate, event.getDate());
         updateFieldIfNotNull(existingEvent::setLocation, event.getLocation());
         updateFieldIfNotNull(existingEvent::setType, event.getType());
         updateFieldIfNotNull(existingEvent::setMaxParticipants, event.getMaxParticipants());
-        updateFieldIfNotNull(existingEvent::setParticipants, event.getParticipants());
         updateFieldIfNotNull(existingEvent::setHostingCompanies, event.getHostingCompanies());
         updateFieldIfNotNull(existingEvent::setSpeakers, event.getSpeakers());
         updateFieldIfNotNull(existingEvent::setFilter, event.getFilter());
 
         eventRepository.updateEvent(existingEvent);
+
+        // Fetch email addresses of participants
+        List<String> participantEmails = existingEvent.getParticipants().stream()
+                .map(userRepository::findUserById)
+                .map(User::getEmail)
+                .collect(Collectors.toList());
+
+        String subject = "Event Updated: " + existingEvent.getTitle();
+        String body = "The event you are participating in has been updated. Please check the details.\n\n" + changesSummary;
+        emailService.sendUpdateEmailToParticipants(participantEmails, subject, body);
     }
+
 
     private <T> void updateFieldIfNotNull(Consumer<T> setter, T value) {
         if (value != null) {
@@ -141,7 +156,6 @@ public class EventService {
         }
     }
 
-
     private EventResponse toEventResponse(Event event) {
         EventResponse response = new EventResponse();
         response.setId(event.getId().toString());
@@ -154,5 +168,33 @@ public class EventService {
         response.setHostingCompanies(event.getHostingCompanies());
         response.setSpeakers(event.getSpeakers());
         return response;
+    }
+
+    private String generateEventChangesSummary(Event oldEvent, Event newEvent) {
+        StringBuilder changes = new StringBuilder("The following changes were made to the event:\n");
+
+        if (!oldEvent.getTitle().equals(newEvent.getTitle())) {
+            changes.append("Title: ").append(oldEvent.getTitle()).append(" -> ").append(newEvent.getTitle()).append("\n");
+        }
+        if (!oldEvent.getDate().equals(newEvent.getDate())) {
+            changes.append("Date: ").append(oldEvent.getDate()).append(" -> ").append(newEvent.getDate()).append("\n");
+        }
+        if (!oldEvent.getLocation().equals(newEvent.getLocation())) {
+            changes.append("Location: ").append(oldEvent.getLocation()).append(" -> ").append(newEvent.getLocation()).append("\n");
+        }
+        if (!oldEvent.getType().equals(newEvent.getType())) {
+            changes.append("Type: ").append(oldEvent.getType()).append(" -> ").append(newEvent.getType()).append("\n");
+        }
+        if (!oldEvent.getMaxParticipants().equals(newEvent.getMaxParticipants())) {
+            changes.append("Max Participants: ").append(oldEvent.getMaxParticipants()).append(" -> ").append(newEvent.getMaxParticipants()).append("\n");
+        }
+        if (!oldEvent.getHostingCompanies().equals(newEvent.getHostingCompanies())) {
+            changes.append("Hosting Companies: ").append(oldEvent.getHostingCompanies()).append(" -> ").append(newEvent.getHostingCompanies()).append("\n");
+        }
+        if (!oldEvent.getSpeakers().equals(newEvent.getSpeakers())) {
+            changes.append("Speakers: ").append(oldEvent.getSpeakers()).append(" -> ").append(newEvent.getSpeakers()).append("\n");
+        }
+
+        return changes.toString();
     }
 }

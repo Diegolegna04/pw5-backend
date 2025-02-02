@@ -8,7 +8,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
-
 @ApplicationScoped
 public class UserRepository implements PanacheMongoRepository<User> {
 

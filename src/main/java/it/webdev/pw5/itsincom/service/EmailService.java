@@ -1,11 +1,10 @@
-
 package it.webdev.pw5.itsincom.service;
 
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-
+import java.util.List;
 
 @ApplicationScoped
 public class EmailService {
@@ -27,5 +26,11 @@ public class EmailService {
                         "<br><a href=\"" +
                         ticketUrl +
                         "\">Download ticket</a>"));
+    }
+
+    public void sendUpdateEmailToParticipants(List<String> emails, String subject, String body) {
+        for (String email : emails) {
+            mailer.send(Mail.withHtml(email, subject, body));
+        }
     }
 }
