@@ -36,13 +36,14 @@ public class CustomExceptionMapper implements ExceptionMapper<Exception> {
             case "UserUnauthorized" -> "User is not authorized to perform this action.";
             case "UserIsNotVerified" -> "User must verify his email before proceeding.";
             case "XSSAttackAttempt" -> "Potential XSS attack attempt detected, input is empty";
+            case "PartnerAlreadyExists" -> "A partner with the same info already exists";
             default -> "Unexpected error: " + e.getMessage();
         };
     }
 
     private Response.Status getStatusCode(Exception e) {
         return switch (e.getClass().getSimpleName()) {
-            case "EmailNotAvailable", "LoginNotPossible" -> Response.Status.CONFLICT;
+            case "EmailNotAvailable", "LoginNotPossible", "PartnerAlreadyExists" -> Response.Status.CONFLICT;
             case "EmptyField", "InvalidEmailFormat", "SessionCookieIsNull", "XSSAttackAttempt" -> Response.Status.BAD_REQUEST;
             case "WrongEmailOrPassword", "UserUnauthorized", "UserIsNotVerified" -> Response.Status.UNAUTHORIZED;
             case "SessionNotFound", "UserNotFound" -> Response.Status.NOT_FOUND;

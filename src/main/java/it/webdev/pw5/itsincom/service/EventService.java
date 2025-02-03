@@ -25,38 +25,16 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class EventService {
 
-    @Inject
-    EventRepository eventRepository;
-    @Inject
-    UserService userService;
-    @Inject
-    EmailService emailService;
-    @Inject
-    UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final UserService userService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
-    public PagedListResponse<EventResponse> getAllEvents(int page, int size) {
-        if (page < 1 || size < 1) {
-            throw new IllegalArgumentException("Page and size must be greater than 0");
-        }
-
-        Date currentDate = new Date();
-        List<Event> events = eventRepository.findAllEvents(page, size);
-        List<EventResponse> eventResponses = events.stream()
-                .map(event -> {
-                    EventResponse response = toEventResponse(event);
-                    if (event.getDate().before(currentDate)) {
-                        response.setFilter(EventResponse.Filter.PAST);
-                    } else {
-                        response.setFilter(EventResponse.Filter.UPCOMING);
-                    }
-                    return response;
-                })
-                .collect(Collectors.toList());
-
-        long totalCount = eventRepository.countAllEvents();
-        int totalPages = (int) Math.ceil((double) totalCount / size);
-
-        return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
+    public EventService(EventRepository eventRepository, UserService userService, EmailService emailService, UserRepository userRepository) {
+        this.eventRepository = eventRepository;
+        this.userService = userService;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     public Event getEventById(ObjectId id) {
@@ -132,32 +110,6 @@ public class EventService {
         event.delete();
     }
 
-    public PagedListResponse<EventResponse> filterEventsByYear(int year, int page, int size) {
-        try {
-            if (page < 1 || size < 1) {
-                throw new IllegalArgumentException("Page and size must be greater than 0");
-            }
-            // Recupera gli eventi filtrati per anno con paginazione
-            List<Event> events = eventRepository.findAllFilteredEvents(year, page, size);
-            // Converte gli eventi in EventResponse
-            List<EventResponse> eventResponses = events
-                    .stream()
-                    .map(this::toEventResponse)
-                    .collect(Collectors.toList());
-
-            // Recupera il numero totale di eventi filtrati per anno
-            long totalCount = eventRepository.countFilteredEventsByYear(year);
-
-            // Calcola il numero totale di pagine
-            int totalPages = (int) Math.ceil((double) totalCount / size);
-
-            return new PagedListResponse<>(eventResponses, page, size, totalCount, totalPages);
-        } catch (Exception e) {
-            System.err.println("An unexpected error occurred while fetching events: " + e.getMessage());
-            throw new RuntimeException("Failed to fetch events", e);
-        }
-    }
-
     public PagedListResponse<EventResponse> getFilteredEvents(int page, int size, EventFilters filters) {
         // Build the query
         StringBuilder queryBuilder = new StringBuilder();
@@ -198,7 +150,6 @@ public class EventService {
 
         PanacheQuery<Event> query;
         if (!conditions.isEmpty()) {
-            System.out.println("Query finale: " + queryBuilder);
             query = eventRepository.find(queryBuilder.toString(), params.toArray());
         } else {
             query = eventRepository.findAll();

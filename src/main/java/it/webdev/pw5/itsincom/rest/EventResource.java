@@ -18,8 +18,11 @@ import org.bson.types.ObjectId;
 @Path("/api/events")
 public class EventResource {
 
-    @Inject
-    EventService eventService;
+    private final EventService eventService;
+
+    public EventResource(EventService eventService){
+        this.eventService = eventService;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
