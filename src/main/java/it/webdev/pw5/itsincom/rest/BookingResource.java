@@ -29,7 +29,7 @@ public class BookingResource {
         if (page < 1 || size < 1) {
             throw new IllegalArgumentException("Invalid page or size");
         }
-        return bookingService.getAllBookings(page, size);
+        return bookingService.getPagedBookings(page, size);
     }
 
     @GET
@@ -53,7 +53,16 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException, WriterException {
         bookingService.acceptBooking(token, id);
-        return Response.ok().entity("booking accepted").build();
+        return Response.ok().entity("{\"message\": \"booking accepted\"}").build();
+    }
+
+    @PUT
+    @Path("accept-all/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response acceptAllBookings(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
+        bookingService.acceptAllBookings(token, id);
+        return Response.ok().entity("{\"message\": \"all bookings accepted\"}").build();
     }
 
     @PUT
@@ -62,6 +71,6 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound {
         bookingService.cancelBooking(token, id);
-        return Response.ok().entity("booking canceled").build();
+        return Response.ok().entity("{\"message\": \"booking canceled\"}").build();
     }
 }

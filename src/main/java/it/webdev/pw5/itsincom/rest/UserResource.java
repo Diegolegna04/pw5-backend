@@ -58,6 +58,6 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUser(@CookieParam("SESSION_COOKIE") String token, UserUpdated newUser) throws UserNotFound, SessionNotFound, SessionCookieIsNull {
         userService.updateUser(token, newUser);
-        return Response.ok().entity("Modifica andata a buon fine").build();
+        return Response.ok().entity("{\"message\": \"Modifica andata a buon fine\"}").build();
     }
 }
