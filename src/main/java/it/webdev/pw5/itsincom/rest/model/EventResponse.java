@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.Speaker;
 
 import java.util.Date;
@@ -17,9 +18,26 @@ public class EventResponse {
     private List<String> hostingCompanies;
     private List<Speaker> speakers;
 
-
     public enum Filter {
         UPCOMING, PAST
+    }
+
+    public static EventResponse mapEventToEventResponse(Event event) {
+        EventResponse response = new EventResponse();
+        response.setId(event.getId().toString());
+        response.setDate(event.getDate());
+        response.setType(event.getType());
+        response.setTitle(event.getTitle());
+        response.setLocation(event.getLocation());
+        response.setParticipantCount(event.getParticipants() != null ? event.getParticipants().size() : 0);
+        response.setMaxParticipants(event.getMaxParticipants());
+        response.setHostingCompanies(event.getHostingCompanies());
+        response.setSpeakers(event.getSpeakers());
+        if (event.getFilter() != null) {
+            response.setFilter(EventResponse.Filter.valueOf(event.getFilter().name()));
+        }
+
+        return response;
     }
 
     public EventResponse() {

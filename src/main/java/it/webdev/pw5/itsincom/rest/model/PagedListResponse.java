@@ -9,6 +9,9 @@ public class PagedListResponse<T> {
     private long totalItems;
     private int totalPages;
 
+    public PagedListResponse() {
+
+    }
     public PagedListResponse(List<T> items, int currentPage, int pageSize, long totalItems, int totalPages) {
         this.items = items;
         this.currentPage = currentPage;

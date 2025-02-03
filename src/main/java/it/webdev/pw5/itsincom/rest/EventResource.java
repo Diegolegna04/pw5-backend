@@ -1,6 +1,7 @@
 package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Event;
+import it.webdev.pw5.itsincom.percistence.model.EventFilters;
 import it.webdev.pw5.itsincom.rest.model.EventResponse;
 import it.webdev.pw5.itsincom.rest.model.PagedListResponse;
 import it.webdev.pw5.itsincom.service.EventService;
@@ -20,11 +21,13 @@ public class EventResource {
     @Inject
     EventService eventService;
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllEvents(@QueryParam("page") @DefaultValue("1") int page,
-                                 @QueryParam("size") @DefaultValue("10") int size) {
-        PagedListResponse<EventResponse> response = eventService.getAllEvents(page, size);
+    public Response getFilteredEvents(@QueryParam("page") @DefaultValue("1") int page,
+                                      @QueryParam("size") @DefaultValue("10") int size,
+                                      EventFilters filters) {
+        PagedListResponse<EventResponse> response = eventService.getFilteredEvents(page, size, filters);
         return Response.ok(response).build();
     }
 
@@ -62,17 +65,5 @@ public class EventResource {
     public Response deleteEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, SessionNotFound, UserUnauthorized {
         eventService.deleteEvent(token, id);
         return Response.ok("Event deleted successfully").build();
-    }
-
-    // FILTERS
-    // By Year
-    @GET
-    @Path("/filter")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getEventsByYear(@QueryParam("year") Integer year,
-                                    @QueryParam("page") @DefaultValue("1") int page,
-                                    @QueryParam("size") @DefaultValue("10") int size) {
-        PagedListResponse<EventResponse> response = eventService.filterEventsByYear(year, page, size);
-        return Response.ok(response).build();
     }
 }

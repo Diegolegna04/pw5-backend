@@ -5,7 +5,6 @@ import io.quarkus.panache.common.Sort;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
-
 import java.util.List;
 
 

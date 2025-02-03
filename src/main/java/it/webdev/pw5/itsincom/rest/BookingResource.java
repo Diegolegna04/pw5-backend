@@ -1,7 +1,6 @@
 package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
-import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.service.BookingService;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;

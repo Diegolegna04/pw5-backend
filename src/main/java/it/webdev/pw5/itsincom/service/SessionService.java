@@ -19,12 +19,8 @@ public class SessionService {
     }
 
     public void deleteSession(String token) throws SessionNotFound {
-        try{
-            Session s = sessionRepository.findSessionByCookie(token);
-            sessionRepository.deleteSession(s);
-        }catch (Exception e){
-            throw new SessionNotFound();
-        }
+        Session s = sessionRepository.findSessionByCookie(token);
+        sessionRepository.deleteSession(s);
     }
 
     public void checkSession(String token) throws SessionNotFound {
