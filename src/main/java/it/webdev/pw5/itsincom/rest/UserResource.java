@@ -4,7 +4,6 @@ import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.rest.model.UserResponse;
 import it.webdev.pw5.itsincom.rest.model.UserUpdated;
-import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.UserService;
 import it.webdev.pw5.itsincom.service.exception.SessionCookieIsNull;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
@@ -14,12 +13,10 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import java.util.Collections;
 import java.util.List;
 
 
-@Path("/api/users")
+@Path("/api/user")
 public class UserResource {
 
     @Inject
@@ -32,7 +29,6 @@ public class UserResource {
         List<User> users = userService.getAllUsers(token);
         return Response.ok(users).build();
     }
-
 
     @GET
     @Path("/bookings")
