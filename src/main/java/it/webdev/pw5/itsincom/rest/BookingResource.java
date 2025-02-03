@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.rest;
 
+import com.google.zxing.WriterException;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.rest.model.BookingResponse;
 import it.webdev.pw5.itsincom.service.BookingService;
@@ -50,7 +51,7 @@ public class BookingResource {
     @Path("/accept/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
+    public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException, WriterException {
         bookingService.acceptBooking(token, id);
         return Response.ok().entity("booking accepted").build();
     }

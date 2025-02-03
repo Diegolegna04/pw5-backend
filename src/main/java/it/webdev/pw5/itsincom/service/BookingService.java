@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.service;
 
+import com.google.zxing.WriterException;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.Ticket;
@@ -45,7 +46,7 @@ public class BookingService {
         if (booking.getEventId() == null) {
             throw new IllegalArgumentException("EventId is required");
         }
-        booking.setUserId(user.getId()); // Set the user ID from the token
+        booking.setUserId(user.getId());
         if (!user.getRole().equals(User.Role.USER)) {
             throw new UserUnauthorized();
         }
@@ -53,11 +54,15 @@ public class BookingService {
             throw new IllegalArgumentException("This event has already been booked by the user");
         }
 
-        bookingRepository.saveBooking(booking);
-
         Event event = eventRepository.findEventById(booking.getEventId());
+        if (event.getParticipants().size() >= event.getMaxParticipants()) {
+            throw new IllegalArgumentException("The event has reached the maximum number of participants");
+        }
         event.addParticipant(user.getId());
         eventRepository.persistOrUpdate(event);
+
+        bookingRepository.saveBooking(booking);
+
 
         String userEmail = user.getEmail();
         emailService.sendBookingConfirmation(
@@ -76,7 +81,7 @@ public class BookingService {
     }
 
 
-    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
+    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException, WriterException {
         User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new UserUnauthorized();
