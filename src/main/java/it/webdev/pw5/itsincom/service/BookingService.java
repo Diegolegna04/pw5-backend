@@ -113,9 +113,6 @@ public class BookingService {
 
     public void cancelBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound, UserUnauthorized {
         User user = userService.findUserByToken(token);
-        if (!user.getRole().equals(User.Role.ADMIN)) {
-            throw new UserUnauthorized();
-        }
         bookingRepository.cancelBooking(bookingId);
     }
 

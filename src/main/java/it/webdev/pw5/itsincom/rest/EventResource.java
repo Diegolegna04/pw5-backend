@@ -46,7 +46,7 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response addEvent(@CookieParam("SESSION_COOKIE") String token, Event event) throws UserNotFound, SessionNotFound, UserUnauthorized {
         eventService.addEvent(token, event);
-        return Response.ok("Event created successfully").build();
+        return Response.ok("{\"message: \": \"Event created successfully\"}").build();
     }
 
     @PUT
@@ -55,7 +55,7 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id, Event event) throws UserNotFound, SessionNotFound, UserUnauthorized {
         eventService.updateEvent(token, id, event);
-        return Response.ok("Event updated successfully").build();
+        return Response.ok("{\"message\": \"Event updated successfully\"}").build();
     }
 
     @DELETE
@@ -64,6 +64,6 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, SessionNotFound, UserUnauthorized {
         eventService.deleteEvent(token, id);
-        return Response.ok("Event deleted successfully").build();
+        return Response.ok("{\"message\": \"Event deleted successfully\"}").build();
     }
 }

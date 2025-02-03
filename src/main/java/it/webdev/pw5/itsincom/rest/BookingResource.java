@@ -53,7 +53,7 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response acceptBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException, WriterException {
         bookingService.acceptBooking(token, id);
-        return Response.ok().entity("booking accepted").build();
+        return Response.ok().entity("{\"message\": \"Booking accepted\"}").build();
     }
 
     @PUT
@@ -62,6 +62,6 @@ public class BookingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response cancelBooking(@CookieParam("SESSION_COOKIE") String token, @PathParam("id") ObjectId id) throws UserNotFound, UserUnauthorized, SessionNotFound {
         bookingService.cancelBooking(token, id);
-        return Response.ok().entity("booking canceled").build();
+        return Response.ok().entity("{\"message\": \"Booking canceled\"}").build();
     }
 }
