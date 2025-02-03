@@ -21,7 +21,10 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
         return s;
     }
 
-    public void deleteSession(Session s) {
+    public void deleteSession(Session s) throws SessionNotFound {
+        if (s == null){
+            throw new SessionNotFound();
+        }
         delete(s);
     }
 

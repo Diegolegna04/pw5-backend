@@ -54,7 +54,7 @@ public class AuthService {
 
     private void sendVerificationEmail(String token, String email) {
         // Build the verification link
-        String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
+        String verificationLink = "http://localhost:4200/verify-account?token=" + token;
         String message = "Clicca sul <a href=\"" + verificationLink + "\">link</a> di verifica per autenticare la tua email";
         // Send verification
         emailService.sendVerificationEmail(email, message);

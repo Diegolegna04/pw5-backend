@@ -1,5 +1,6 @@
 package it.webdev.pw5.itsincom.service;
 
+import com.google.zxing.WriterException;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.Ticket;
@@ -85,7 +86,7 @@ public class BookingService {
     }
 
 
-    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException {
+    public void acceptBooking(String token, ObjectId bookingId) throws UserNotFound, UserUnauthorized, SessionNotFound, IOException, WriterException {
         User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new UserUnauthorized();

@@ -14,9 +14,8 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-
-
 import java.util.Collections;
+
 
 @Path("/api/auth")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -55,26 +54,6 @@ public class AuthResource {
                 .build();
     }
 
-    @Path("/check-session")
-    @GET
-    public Response checkIfUserHasActiveSession(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound {
-        if (token == null || token.isBlank()) {
-            throw new SessionCookieIsNull();
-        }
-        sessionService.checkSession(token);
-        return Response.ok().entity("{\"message\": \"Session is valid\"}").build();
-    }
-
-    @Path("/check-role")
-    @GET
-    public Response checkUserRole(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound, UserNotFound {
-        if (token == null || token.isBlank()) {
-            throw new SessionCookieIsNull();
-        }
-        User user = userService.findUserByToken(token);
-        return Response.ok().entity(Collections.singletonMap("role", user.getRole().name())).build();
-    }
-
     @DELETE
     @Path("/logout")
     public Response logoutUser(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound {
@@ -89,5 +68,25 @@ public class AuthResource {
                 .secure(false)
                 .build();
         return Response.ok().entity("{\"message\": \"Logout succeeded\"}").cookie(newCookie).build();
+    }
+
+    @Path("/check-session")
+    @GET
+    public Response checkIfUserHasActiveSession(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound {
+        if (token == null || token.isBlank()) {
+            throw new SessionCookieIsNull();
+        }
+        sessionService.checkSession(token);
+        return Response.ok().entity("{\"message\": \"Session is valid\"}").build();
+    }
+
+    @Path("/role")
+    @GET
+    public Response getUserRole(@CookieParam("SESSION_COOKIE") String token) throws SessionCookieIsNull, SessionNotFound, UserNotFound {
+        if (token == null || token.isBlank()) {
+            throw new SessionCookieIsNull();
+        }
+        User user = userService.findUserByToken(token);
+        return Response.ok().entity(Collections.singletonMap("role", user.getRole().name())).build();
     }
 }

@@ -29,9 +29,7 @@ public class RegisterRequest {
         this.password = sanitizeInput(this.password);
     }
 
-    // Utilize JSoup to sanitize and remove dangerous input
     private String sanitizeInput(String input) throws XSSAttackAttempt {
-        // Sanitize input
         String sanitizedInput = Jsoup.clean(input, Safelist.basic());
         if (sanitizedInput.isEmpty()) {
             throw new XSSAttackAttempt();

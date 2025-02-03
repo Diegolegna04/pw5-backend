@@ -1,6 +1,8 @@
 package it.webdev.pw5.itsincom.service;
 
+import io.quarkus.mongodb.panache.PanacheQuery;
 import it.webdev.pw5.itsincom.percistence.model.Event;
+import it.webdev.pw5.itsincom.percistence.model.EventFilters;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.EventRepository;
 import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
@@ -13,6 +15,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -133,10 +137,8 @@ public class EventService {
             if (page < 1 || size < 1) {
                 throw new IllegalArgumentException("Page and size must be greater than 0");
             }
-
             // Recupera gli eventi filtrati per anno con paginazione
             List<Event> events = eventRepository.findAllFilteredEvents(year, page, size);
-
             // Converte gli eventi in EventResponse
             List<EventResponse> eventResponses = events
                     .stream()
@@ -154,6 +156,67 @@ public class EventService {
             System.err.println("An unexpected error occurred while fetching events: " + e.getMessage());
             throw new RuntimeException("Failed to fetch events", e);
         }
+    }
+
+    public PagedListResponse<EventResponse> getFilteredEvents(int page, int size, EventFilters filters) {
+        // Build the query
+        StringBuilder queryBuilder = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        List<String> conditions = new ArrayList<>();
+
+        // 1. Filter for year
+        if (filters.getYear() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(filters.getYear(), Calendar.JANUARY, 1, 0, 0, 0);
+            Date startDate = cal.getTime();
+            cal.set(filters.getYear() + 1, Calendar.JANUARY, 1, 0, 0, 0);
+            Date endDate = cal.getTime();
+
+            conditions.add("\"date\": { \"$gte\": ?1, \"$lt\": ?2 }");
+            params.add(startDate);
+            params.add(endDate);
+        }
+
+        // 2. Filter for speaker
+        if (filters.getSpeaker() != null && !filters.getSpeaker().trim().isEmpty()) {
+            conditions.add("\"speakers.name\": ?".concat(String.valueOf(params.size() + 1)));
+            params.add(filters.getSpeaker().trim());
+        }
+
+        // 3. Filter for type
+        if (filters.getType() != null && !filters.getType().trim().isEmpty()) {
+            conditions.add("\"type\": ?".concat(String.valueOf(params.size() + 1)));
+            params.add(filters.getType().trim());
+        }
+
+        // Combine filters with $and
+        if (!conditions.isEmpty()) {
+            queryBuilder.append("{ \"$and\": [ ");
+            queryBuilder.append(conditions.stream().map(c -> "{ " + c + " }").collect(Collectors.joining(", ")));
+            queryBuilder.append(" ] }");
+        }
+
+        PanacheQuery<Event> query;
+        if (!conditions.isEmpty()) {
+            System.out.println("Query finale: " + queryBuilder);
+            query = eventRepository.find(queryBuilder.toString(), params.toArray());
+        } else {
+            query = eventRepository.findAll();
+        }
+
+        // Paginate the response
+        query.page(page - 1, size);
+        List<Event> events = query.list();
+        long total = query.count();
+
+        List<EventResponse> eventResponses = events.stream()
+                .map(EventResponse::mapEventToEventResponse)
+                .collect(Collectors.toList());
+
+        PagedListResponse<EventResponse> response = new PagedListResponse<>();
+        response.setTotalItems(total);
+        response.setItems(eventResponses);
+        return response;
     }
 
     private EventResponse toEventResponse(Event event) {
