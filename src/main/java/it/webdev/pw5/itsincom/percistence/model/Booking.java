@@ -3,6 +3,7 @@ package it.webdev.pw5.itsincom.percistence.model;
 import io.quarkus.mongodb.panache.common.MongoEntity;
 import org.bson.types.ObjectId;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @MongoEntity(collection = "booking")
@@ -13,6 +14,7 @@ public class Booking {
     private String name;
     private Status status;
     private Date eventDate;
+    private LocalDateTime bookingDate;
     private String title;
     //TODO: add LOCATION
 
@@ -77,5 +79,13 @@ public class Booking {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public LocalDateTime getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDateTime bookingDate) {
+        this.bookingDate = bookingDate;
     }
 }

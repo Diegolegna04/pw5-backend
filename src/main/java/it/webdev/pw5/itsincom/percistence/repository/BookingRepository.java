@@ -4,9 +4,13 @@ import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.bson.codecs.jsr310.LocalDateCodec;
 import org.bson.types.ObjectId;
+
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.time.LocalDateTime;
 
 
 @ApplicationScoped
@@ -30,6 +34,7 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
         booking.setName(userRepository.findUserById(booking.getUserId()).getName());
         booking.setStatus(Booking.Status.PENDING);
         booking.setEventDate(getEventDate(booking));
+        booking.setBookingDate(LocalDateTime.now());
         this.persist(booking);
     }
 
@@ -56,7 +61,19 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
             persistOrUpdate(booking);
         }
     }
+
     public boolean checkDoubleBooking(ObjectId userId, ObjectId eventId) {
         return find("userId = ?1 and eventId = ?2", userId, eventId).firstResult() != null;
     }
+
+    public List<Booking> findBookingsByEventId(ObjectId eventId) {
+        return list("eventId", eventId).stream()
+                .sorted(Comparator.comparing(
+                        Booking::getBookingDate,
+                        Comparator.nullsLast(Comparator.naturalOrder()) // I null vengono messi in fondo
+                ))
+                .toList();
+    }
+
+
 }

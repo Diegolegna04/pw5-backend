@@ -16,6 +16,7 @@ import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -35,9 +36,13 @@ public class BookingService {
     @Inject
     PdfService pdfService;
 
-    public List<BookingResponse> getAllBookings(int page, int size) {
+    public List<BookingResponse> getPagedBookings(int page, int size) {
         return bookingRepository.findAll().page(page - 1, size)
                 .list().stream().map(this::toBookingResponse).toList();
+    }
+
+    public List<Booking> getAllBookingsByEventID(ObjectId eventId) {
+        return bookingRepository.findBookingsByEventId(eventId);
     }
 
     public void createBooking(String token, Booking booking) throws UserNotFound, SessionNotFound, UserUnauthorized {
@@ -126,4 +131,32 @@ public class BookingService {
         response.setEventId(booking.getEventId().toString());
         return response;
     }
+
+    public void acceptAllBookings(String token, ObjectId id) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        User user = userService.findUserByToken(token);
+
+        if (!user.getRole().equals(User.Role.ADMIN)) {
+            throw new UserUnauthorized();
+        }
+
+        Event e = eventRepository.findEventById(id);
+        if (e == null) {
+            throw new IllegalArgumentException("Evento non trovato con ID: " + id);
+        }
+
+        int maxParticipants = e.getMaxParticipants();
+        List<Booking> bookings = getAllBookingsByEventID(id);
+
+        if (bookings.isEmpty()) {
+            System.out.println("Nessuna prenotazione disponibile per questo evento.");
+            return;
+        }
+
+        int toAccept = Math.min(maxParticipants, bookings.size());
+
+        for (int i = 0; i < toAccept; i++) {
+            bookingRepository.acceptBooking(bookings.get(i).getId());
+        }
+    }
+
 }
