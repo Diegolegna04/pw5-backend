@@ -76,4 +76,13 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
     }
 
 
+    public List<Booking> findPendingBookingsByEventId(ObjectId eventId) {
+        return list("eventId = ?1 and status = ?2", eventId, Booking.Status.PENDING).stream()
+                .sorted(Comparator.comparing(
+                        Booking::getBookingDate,
+                        Comparator.nullsLast(Comparator.naturalOrder()) // I null vengono messi in fondo
+                ))
+                .toList();
+    }
+
 }

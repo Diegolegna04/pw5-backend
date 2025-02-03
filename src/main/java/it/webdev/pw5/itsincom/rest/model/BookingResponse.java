@@ -1,11 +1,13 @@
 package it.webdev.pw5.itsincom.rest.model;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
+import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BookingResponse {
+    private ObjectId id;
     private Date eventDate;
     private Booking.Status status;
     private String title;
@@ -50,5 +52,13 @@ public class BookingResponse {
 
     public void setBookingDate(LocalDateTime bookingDate) {
         this.bookingDate = bookingDate;
+    }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 }
