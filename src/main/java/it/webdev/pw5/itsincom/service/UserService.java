@@ -1,6 +1,5 @@
 package it.webdev.pw5.itsincom.service;
 
-import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.percistence.repository.UserRepository;
@@ -11,7 +10,6 @@ import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import java.util.List;
 
@@ -19,14 +17,17 @@ import java.util.List;
 @ApplicationScoped
 public class UserService {
 
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    HashCalculator hashCalculator;
-    @Inject
-    SessionRepository sessionRepository;
-    @Inject
-    BookingService bookingService;
+    private final UserRepository userRepository;
+    private final HashCalculator hashCalculator;
+    private final SessionRepository sessionRepository;
+    private final BookingService bookingService;
+
+    public UserService(UserRepository userRepository, HashCalculator hashCalculator, SessionRepository sessionRepository, BookingService bookingService) {
+        this.userRepository = userRepository;
+        this.hashCalculator = hashCalculator;
+        this.sessionRepository = sessionRepository;
+        this.bookingService = bookingService;
+    }
 
     public List<User> getAllUsers(String token) throws SessionNotFound, UserNotFound, UserUnauthorized, SessionCookieIsNull {
         if (token == null || token.isEmpty()) {

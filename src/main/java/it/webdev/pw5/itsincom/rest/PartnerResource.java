@@ -1,7 +1,6 @@
 package it.webdev.pw5.itsincom.rest;
 
 import it.webdev.pw5.itsincom.percistence.model.Partner;
-import it.webdev.pw5.itsincom.percistence.repository.PartnerRepository;
 import it.webdev.pw5.itsincom.rest.model.PartnerRequest;
 import it.webdev.pw5.itsincom.service.PartnerService;
 import it.webdev.pw5.itsincom.service.exception.PartnerAlreadyExists;

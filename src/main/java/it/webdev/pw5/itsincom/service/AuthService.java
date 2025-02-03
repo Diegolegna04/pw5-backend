@@ -11,7 +11,6 @@ import it.webdev.pw5.itsincom.service.exception.*;
 import it.webdev.pw5.itsincom.service.exception.EmailNotAvailable;
 import it.webdev.pw5.itsincom.service.exception.WrongEmailOrPassword;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.bson.types.ObjectId;
 
@@ -19,17 +18,19 @@ import org.bson.types.ObjectId;
 @ApplicationScoped
 public class AuthService {
 
-    @Inject
-    AuthRepository authRepository;
-    @Inject
-    SessionService sessionService;
-    @Inject
-    SessionRepository sessionRepository;
-    @Inject
-    EmailService emailService;
-    @Inject
-    UserRepository userRepository;
+    private final AuthRepository authRepository;
+    private final SessionService sessionService;
+    private final SessionRepository sessionRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
+    public AuthService(AuthRepository authRepository, SessionService sessionService, SessionRepository sessionRepository, EmailService emailService, UserRepository userRepository) {
+        this.authRepository = authRepository;
+        this.sessionService = sessionService;
+        this.sessionRepository = sessionRepository;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
+    }
 
     @Transactional
     public void registerUser(RegisterRequest req) throws EmailNotAvailable {

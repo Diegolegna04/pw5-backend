@@ -4,15 +4,17 @@ import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.percistence.repository.SessionRepository;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 
 
 @ApplicationScoped
 public class SessionService {
 
-    @Inject
-    SessionRepository sessionRepository;
+    private final SessionRepository sessionRepository;
+
+    public SessionService(SessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
 
     public Session createAndPersistSession(ObjectId userId) {
         return sessionRepository.createAndPersistSession(userId);

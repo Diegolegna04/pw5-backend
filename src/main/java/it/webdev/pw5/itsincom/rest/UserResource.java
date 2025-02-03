@@ -9,7 +9,6 @@ import it.webdev.pw5.itsincom.service.exception.SessionCookieIsNull;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -19,8 +18,11 @@ import java.util.List;
 @Path("/api/user")
 public class UserResource {
 
-    @Inject
-    UserService userService;
+    private final UserService userService;
+
+    public UserResource(UserService userService) {
+        this.userService = userService;
+    }
 
     @GET
     @Consumes(MediaType.APPLICATION_JSON)

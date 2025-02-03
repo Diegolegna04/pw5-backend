@@ -13,29 +13,29 @@ import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 
 @ApplicationScoped
 public class BookingService {
 
-    @Inject
-    BookingRepository bookingRepository;
-    @Inject
-    UserRepository userRepository;
-    @Inject
-    UserService userService;
-    @Inject
-    EmailService emailService;
-    @Inject
-    EventRepository eventRepository;
-    @Inject
-    PdfService pdfService;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final EmailService emailService;
+    private final EventRepository eventRepository;
+    private final PdfService pdfService;
+
+    public BookingService(BookingRepository bookingRepository, UserRepository userRepository, UserService userService, EmailService emailService, EventRepository eventRepository, PdfService pdfService) {
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.emailService = emailService;
+        this.eventRepository = eventRepository;
+        this.pdfService = pdfService;
+    }
 
     public List<BookingResponse> getPagedBookings(int page, int size) {
         return bookingRepository.findAll().page(page - 1, size)
@@ -156,5 +156,4 @@ public class BookingService {
             bookingRepository.acceptBooking(bookings.get(i).getId());
         }
     }
-
 }

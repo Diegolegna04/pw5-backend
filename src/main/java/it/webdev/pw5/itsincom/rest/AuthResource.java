@@ -8,7 +8,6 @@ import it.webdev.pw5.itsincom.service.AuthService;
 import it.webdev.pw5.itsincom.service.SessionService;
 import it.webdev.pw5.itsincom.service.UserService;
 import it.webdev.pw5.itsincom.service.exception.*;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -22,12 +21,15 @@ import java.util.Collections;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthResource {
 
-    @Inject
-    AuthService authService;
-    @Inject
-    SessionService sessionService;
-    @Inject
-    UserService userService;
+    private final AuthService authService;
+    private final SessionService sessionService;
+    private final UserService userService;
+
+    public AuthResource(AuthService authService, SessionService sessionService, UserService userService){
+        this.authService = authService;
+        this.sessionService = sessionService;
+        this.userService = userService;
+    }
 
     @Path("/register")
     @POST

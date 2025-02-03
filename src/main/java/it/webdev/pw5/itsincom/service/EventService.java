@@ -12,15 +12,14 @@ import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 
 @ApplicationScoped
 public class EventService {

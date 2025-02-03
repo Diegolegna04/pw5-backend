@@ -7,20 +7,22 @@ import it.webdev.pw5.itsincom.service.BookingService;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.bson.types.ObjectId;
-
 import java.io.IOException;
 import java.util.List;
+
 
 @Path("/api/bookings")
 public class BookingResource {
 
-    @Inject
-    BookingService bookingService;
+    private final BookingService bookingService;
+
+    public BookingResource(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
