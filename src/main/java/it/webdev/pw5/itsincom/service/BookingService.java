@@ -60,9 +60,9 @@ public class BookingService {
         }
 
         Event event = eventRepository.findEventById(booking.getEventId());
-        if (event.getParticipants().size() >= event.getMaxParticipants()) {
+/*        if (event.getParticipants().size() >= event.getMaxParticipants()) {
             throw new IllegalArgumentException("The event has reached the maximum number of participants");
-        }
+        }*/
         event.addParticipant(user.getId());
         eventRepository.persistOrUpdate(event);
 
@@ -117,12 +117,44 @@ public class BookingService {
     }
 
     public void cancelBooking(String token, ObjectId bookingId) throws UserNotFound, SessionNotFound, UserUnauthorized {
+        if (token == null) {
+            throw new SessionNotFound();
+        }
+
         User user = userService.findUserByToken(token);
+        if (user == null) {
+            throw new UserNotFound();
+        }
+
+        Booking booking = bookingRepository.findById(bookingId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Prenotazione non trovata con ID: " + bookingId);
+        }
+
+        Event event = eventRepository.findEventById(booking.getEventId());
+        if (event == null) {
+            throw new IllegalArgumentException("Evento non trovato per la prenotazione: " + bookingId);
+        }
+
+        // 1️⃣ Rimuove l'utente dalla lista dei partecipanti dell'evento
+        eventRepository.removeParticipant(user, event);
+        eventRepository.update(event);
+
+        // 2️⃣ Cancella la prenotazione
         bookingRepository.cancelBooking(bookingId);
+
+        // 3️⃣ Controlla se ci sono prenotazioni in PENDING per l'evento e accetta la prima disponibile
+        List<Booking> pendingBookings = bookingRepository.findPendingBookingsByEventId(event.getId());
+        if (!pendingBookings.isEmpty()) {
+            Booking nextBooking = pendingBookings.get(0); // Prende la prima prenotazione in attesa
+            bookingRepository.acceptBooking(nextBooking.getId());
+        }
     }
+
 
     public BookingResponse toBookingResponse(Booking booking) {
         BookingResponse response = new BookingResponse();
+        response.setId(booking.getId());
         response.setEventDate(booking.getEventDate());
         response.setTitle(booking.getTitle());
         response.setStatus(booking.getStatus());

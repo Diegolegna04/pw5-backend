@@ -3,8 +3,10 @@ package it.webdev.pw5.itsincom.percistence.repository;
 import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 import io.quarkus.panache.common.Sort;
 import it.webdev.pw5.itsincom.percistence.model.Event;
+import it.webdev.pw5.itsincom.percistence.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
+
 import java.util.List;
 
 
@@ -40,6 +42,11 @@ public class EventRepository implements PanacheMongoRepositoryBase<Event, Object
     }
 
     public void updateEvent(Event event) {
+        this.persistOrUpdate(event);
+    }
+
+    public void removeParticipant(User user, Event event) {
+        event.getParticipants().remove(user.getId());
         this.persistOrUpdate(event);
     }
 }
