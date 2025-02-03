@@ -60,9 +60,9 @@ public class BookingService {
         }
 
         Event event = eventRepository.findEventById(booking.getEventId());
-        if (event.getParticipants().size() >= event.getMaxParticipants()) {
+/*        if (event.getParticipants().size() >= event.getMaxParticipants()) {
             throw new IllegalArgumentException("The event has reached the maximum number of participants");
-        }
+        }*/
         event.addParticipant(user.getId());
         eventRepository.persistOrUpdate(event);
 
