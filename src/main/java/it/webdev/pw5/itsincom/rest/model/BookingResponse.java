@@ -2,6 +2,7 @@ package it.webdev.pw5.itsincom.rest.model;
 
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class BookingResponse {
@@ -9,6 +10,7 @@ public class BookingResponse {
     private Booking.Status status;
     private String title;
     private String eventId;
+    private LocalDateTime bookingDate;
 
     public Date getEventDate() {
         return eventDate;
@@ -40,5 +42,13 @@ public class BookingResponse {
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
+    }
+
+    public LocalDateTime getBookingDate() {
+        return bookingDate;
+    }
+
+    public void setBookingDate(LocalDateTime bookingDate) {
+        this.bookingDate = bookingDate;
     }
 }
