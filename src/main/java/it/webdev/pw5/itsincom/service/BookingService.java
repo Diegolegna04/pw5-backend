@@ -1,6 +1,7 @@
 package it.webdev.pw5.itsincom.service;
 
 import com.google.zxing.WriterException;
+import io.quarkus.scheduler.Scheduled;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import it.webdev.pw5.itsincom.percistence.model.Event;
 import it.webdev.pw5.itsincom.percistence.model.Ticket;
@@ -16,6 +17,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 
@@ -28,6 +32,7 @@ public class BookingService {
     private final EmailService emailService;
     private final EventRepository eventRepository;
     private final PdfService pdfService;
+
 
     public BookingService(BookingRepository bookingRepository, UserRepository userRepository, UserService userService, EmailService emailService, EventRepository eventRepository, PdfService pdfService) {
         this.bookingRepository = bookingRepository;
@@ -189,4 +194,24 @@ public class BookingService {
             bookingRepository.acceptBooking(bookings.get(i).getId());
         }
     }
+
+    @Scheduled(every = "1m") // Eseguito ogni minuto
+    public void checkBookings() {
+        List<Booking> bookings = bookingRepository.findRejectedOrPendingBookings();
+        LocalDate today = LocalDate.now();
+
+        for (Booking booking : bookings) {
+            Date eventDate = booking.getEventDate();
+
+            if (eventDate != null) {
+                LocalDate eventLocalDate = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+                // Se la data evento è passata OPPURE la prenotazione è REJECTED, elimina
+                if (eventLocalDate.isBefore(today) || Booking.Status.REJECTED.equals(booking.getStatus())) {
+                    bookingRepository.delete(booking);
+                }
+            }
+        }
+    }
+
 }

@@ -75,4 +75,6 @@ public class BookingResource {
         bookingService.cancelBooking(token, id);
         return Response.ok().entity("{\"message\": \"booking canceled\"}").build();
     }
+
+
 }

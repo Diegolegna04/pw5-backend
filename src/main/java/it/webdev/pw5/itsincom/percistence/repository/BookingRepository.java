@@ -4,7 +4,6 @@ import io.quarkus.mongodb.panache.PanacheMongoRepositoryBase;
 import it.webdev.pw5.itsincom.percistence.model.Booking;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.bson.codecs.jsr310.LocalDateCodec;
 import org.bson.types.ObjectId;
 
 import java.util.Comparator;
@@ -86,4 +85,7 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
                 .toList();
     }
 
+    public List<Booking> findRejectedOrPendingBookings() {
+        return list("status = ?1 or status = ?2", Booking.Status.REJECTED, Booking.Status.PENDING);
+    }
 }
