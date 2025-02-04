@@ -35,6 +35,7 @@ public class BookingRepository implements PanacheMongoRepositoryBase<Booking, Ob
         booking.setStatus(Booking.Status.PENDING);
         booking.setEventDate(getEventDate(booking));
         booking.setBookingDate(LocalDateTime.now());
+
         this.persist(booking);
     }
 

@@ -17,23 +17,13 @@ public class LoginRequest {
     @Pattern(regexp = "^(?!.*\\s).*$", message = "Password cannot contain spaces")
     private String password;
 
-    public LoginRequest () {
+    public LoginRequest() {
 
     }
 
     public void sanitize() throws XSSAttackAttempt {
-        this.email = sanitizeInput(this.email);
-        this.password = sanitizeInput(this.password);
-    }
-
-    // Utilize JSoup to sanitize and remove dangerous input
-    private String sanitizeInput(String input) throws XSSAttackAttempt {
-        // Sanitize input
-        String sanitizedInput = Jsoup.clean(input, Safelist.basic());
-        if (sanitizedInput.isEmpty()) {
-            throw new XSSAttackAttempt();
-        }
-        return sanitizedInput;
+        this.email = Sanitizer.sanitize(this.email);
+        this.password = Sanitizer.sanitize(this.password);
     }
 
     public String getEmail() {

@@ -1,16 +1,28 @@
 package it.webdev.pw5.itsincom.rest.model;
 
-public class PartnerRequest {
-    String name;
-    String description;
-    String number;
-    String location;
-    String imageBase64;
-    String websiteURL;
+import it.webdev.pw5.itsincom.service.exception.XSSAttackAttempt;
 
-    public PartnerRequest(){
+public class PartnerRequest {
+    private String name;
+    private String description;
+    private String number;
+    private String location;
+    private String imageBase64;
+    private String websiteURL;
+
+    public void sanitizer() throws XSSAttackAttempt {
+        this.name = Sanitizer.sanitize(this.name);
+        this.description = Sanitizer.sanitize(this.description);
+        this.number = Sanitizer.sanitize(this.number);
+        this.location = Sanitizer.sanitize(this.location);
+        this.imageBase64 = Sanitizer.sanitize(this.imageBase64);
+        this.websiteURL = Sanitizer.sanitize(this.websiteURL);
+    }
+
+    public PartnerRequest() {
 
     }
+
     public PartnerRequest(String name, String description, String number, String location, String imageBase64, String websiteURL) {
         this.name = name;
         this.description = description;

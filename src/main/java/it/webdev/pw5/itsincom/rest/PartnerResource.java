@@ -3,10 +3,7 @@ package it.webdev.pw5.itsincom.rest;
 import it.webdev.pw5.itsincom.percistence.model.Partner;
 import it.webdev.pw5.itsincom.rest.model.PartnerRequest;
 import it.webdev.pw5.itsincom.service.PartnerService;
-import it.webdev.pw5.itsincom.service.exception.PartnerAlreadyExists;
-import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
-import it.webdev.pw5.itsincom.service.exception.UserNotFound;
-import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
+import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -32,7 +29,7 @@ public class PartnerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addPartner(@CookieParam("SESSION_COOKIE") String token, PartnerRequest p) throws UserNotFound, UserUnauthorized, SessionNotFound, PartnerAlreadyExists {
+    public Response addPartner(@CookieParam("SESSION_COOKIE") String token, PartnerRequest p) throws UserNotFound, UserUnauthorized, SessionNotFound, PartnerAlreadyExists, XSSAttackAttempt {
         partnerService.addPartner(token, p);
         return Response.ok().build();
     }

@@ -16,7 +16,8 @@ public class Booking {
     private Date eventDate;
     private LocalDateTime bookingDate;
     private String title;
-    //TODO: add LOCATION
+    private String location;
+
 
     public enum Status {
         PENDING, ACCEPTED, REJECTED
@@ -87,5 +88,13 @@ public class Booking {
 
     public void setBookingDate(LocalDateTime bookingDate) {
         this.bookingDate = bookingDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

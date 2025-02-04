@@ -1,5 +1,7 @@
 package it.webdev.pw5.itsincom.rest.model;
 
+import it.webdev.pw5.itsincom.service.exception.XSSAttackAttempt;
+
 public class UserUpdated {
 
     private String name;
@@ -13,6 +15,12 @@ public class UserUpdated {
         this.name = name;
         this.email = email;
         this.password = password;
+    }
+
+    public void sanitize() throws XSSAttackAttempt {
+        this.name = Sanitizer.sanitize(this.name);
+        this.email = Sanitizer.sanitize(this.email);
+        this.password = Sanitizer.sanitize(this.password);
     }
 
     public String getName() {

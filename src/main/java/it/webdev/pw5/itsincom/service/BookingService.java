@@ -14,6 +14,7 @@ import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -60,9 +61,6 @@ public class BookingService {
         }
 
         Event event = eventRepository.findEventById(booking.getEventId());
-/*        if (event.getParticipants().size() >= event.getMaxParticipants()) {
-            throw new IllegalArgumentException("The event has reached the maximum number of participants");
-        }*/
         event.addParticipant(user.getId());
         eventRepository.persistOrUpdate(event);
 
@@ -159,6 +157,9 @@ public class BookingService {
         response.setTitle(booking.getTitle());
         response.setStatus(booking.getStatus());
         response.setEventId(booking.getEventId().toString());
+        response.setEventDate(booking.getEventDate());
+        response.setLocation(booking.getLocation());
+        response.setUserId(booking.getUserId());
         return response;
     }
 

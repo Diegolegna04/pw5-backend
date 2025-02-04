@@ -1,6 +1,7 @@
 package it.webdev.pw5.itsincom.rest.model;
 
 import it.webdev.pw5.itsincom.percistence.model.User;
+import it.webdev.pw5.itsincom.service.exception.XSSAttackAttempt;
 
 
 public class UserResponse {
@@ -21,6 +22,11 @@ public class UserResponse {
         this.name = name;
         this.email = email;
 
+    }
+
+    public void sanitize() throws XSSAttackAttempt {
+        this.name = Sanitizer.sanitize(this.name);
+        this.email = Sanitizer.sanitize(this.email);
     }
 
     public String getName() {

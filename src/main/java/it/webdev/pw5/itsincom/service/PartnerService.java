@@ -4,10 +4,7 @@ import it.webdev.pw5.itsincom.percistence.model.User;
 import it.webdev.pw5.itsincom.percistence.repository.PartnerRepository;
 import it.webdev.pw5.itsincom.percistence.model.Partner;
 import it.webdev.pw5.itsincom.rest.model.PartnerRequest;
-import it.webdev.pw5.itsincom.service.exception.PartnerAlreadyExists;
-import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
-import it.webdev.pw5.itsincom.service.exception.UserNotFound;
-import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
+import it.webdev.pw5.itsincom.service.exception.*;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
@@ -27,7 +24,8 @@ public class PartnerService {
         return partnerRepository.getAllPartners();
     }
 
-    public void addPartner(String token, PartnerRequest p) throws UserNotFound, SessionNotFound, UserUnauthorized, PartnerAlreadyExists {
+    public void addPartner(String token, PartnerRequest p) throws UserNotFound, SessionNotFound, UserUnauthorized, PartnerAlreadyExists, XSSAttackAttempt {
+        p.sanitizer();
         User user = userService.findUserByToken(token);
         if (!user.getRole().equals(User.Role.ADMIN)) {
             throw new UserUnauthorized();
