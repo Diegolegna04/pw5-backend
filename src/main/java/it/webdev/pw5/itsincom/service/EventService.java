@@ -183,6 +183,25 @@ public class EventService {
         return response;
     }
 
+    public PagedListResponse<EventResponse> getUpcomingEvents(){
+        Date currentDate = new Date();
+        List<Event> events = eventRepository.getAllEvents();
+        List<Event> allUpcomingEvents = events.stream()
+                .filter(event -> event.getDate().after(currentDate))
+                .sorted(Comparator.comparing(Event::getDate))
+                .toList();
+        List<Event> upcomingEvents = allUpcomingEvents.subList(0, 3);
+
+        List<EventResponse> eventResponses = upcomingEvents.stream()
+                .map(EventResponse::mapEventToEventResponse)
+                .collect(Collectors.toList());
+
+        PagedListResponse<EventResponse> response = new PagedListResponse<>();
+        response.setTotalItems(eventResponses.size());
+        response.setItems(eventResponses);
+        return response;
+    }
+
     private String generateEventChangesSummary(Event oldEvent, Event newEvent) {
         StringBuilder changes = new StringBuilder("The following changes were made to the event:\n");
 

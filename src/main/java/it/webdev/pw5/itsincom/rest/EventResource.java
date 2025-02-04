@@ -8,7 +8,6 @@ import it.webdev.pw5.itsincom.service.EventService;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -31,6 +30,13 @@ public class EventResource {
                                       @QueryParam("size") @DefaultValue("10") int size,
                                       EventFilters filters) {
         PagedListResponse<EventResponse> response = eventService.getFilteredEvents(page, size, filters);
+        return Response.ok(response).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUpcomingEvents(){
+        PagedListResponse<EventResponse> response = eventService.getUpcomingEvents();
         return Response.ok(response).build();
     }
 
