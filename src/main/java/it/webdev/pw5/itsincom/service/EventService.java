@@ -113,6 +113,8 @@ public class EventService {
         List<Object> params = new ArrayList<>();
         List<String> conditions = new ArrayList<>();
 
+        Date currentDate = new Date();
+
         // 1. Filter for year
         if (filters.getYear() != null) {
             Calendar cal = Calendar.getInstance();
@@ -155,6 +157,15 @@ public class EventService {
 
         // Paginate the response
         List<Event> events = query.list();
+
+        for (Event event : events) {
+            if (event.getDate().after(currentDate)) {
+                event.setFilter(Event.Filter.UPCOMING);
+            } else {
+                event.setFilter(Event.Filter.PAST);
+            }
+        }
+
         events.sort(Comparator.comparing(Event::getDate).reversed());
         long total = events.size();
 
