@@ -13,10 +13,8 @@ import it.webdev.pw5.itsincom.service.exception.UserNotFound;
 import it.webdev.pw5.itsincom.service.exception.UserUnauthorized;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bson.types.ObjectId;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -115,6 +113,8 @@ public class EventService {
         List<Object> params = new ArrayList<>();
         List<String> conditions = new ArrayList<>();
 
+        Date currentDate = new Date();
+
         // 1. Filter for year
         if (filters.getYear() != null) {
             Calendar cal = Calendar.getInstance();
@@ -147,6 +147,7 @@ public class EventService {
             queryBuilder.append(" ] }");
         }
 
+        // Build the query
         PanacheQuery<Event> query;
         if (!conditions.isEmpty()) {
             query = eventRepository.find(queryBuilder.toString(), params.toArray());
@@ -155,31 +156,30 @@ public class EventService {
         }
 
         // Paginate the response
-        query.page(page - 1, size);
         List<Event> events = query.list();
-        long total = query.count();
 
-        List<EventResponse> eventResponses = events.stream()
+        for (Event event : events) {
+            if (event.getDate().after(currentDate)) {
+                event.setFilter(Event.Filter.UPCOMING);
+            } else {
+                event.setFilter(Event.Filter.PAST);
+            }
+        }
+
+        events.sort(Comparator.comparing(Event::getDate).reversed());
+        long total = events.size();
+
+        int fromIndex = Math.min((page - 1) * size, events.size());
+        int toIndex = Math.min(fromIndex + size, events.size());
+        List<Event> paginatedEvents = events.subList(fromIndex, toIndex);
+
+        List<EventResponse> eventResponses = paginatedEvents.stream()
                 .map(EventResponse::mapEventToEventResponse)
                 .collect(Collectors.toList());
 
         PagedListResponse<EventResponse> response = new PagedListResponse<>();
         response.setTotalItems(total);
         response.setItems(eventResponses);
-        return response;
-    }
-
-    private EventResponse toEventResponse(Event event) {
-        EventResponse response = new EventResponse();
-        response.setId(event.getId().toString());
-        response.setDate(event.getDate());
-        response.setType(event.getType());
-        response.setTitle(event.getTitle());
-        response.setLocation(event.getLocation());
-        response.setParticipantCount(event.getParticipants().size());
-        response.setMaxParticipants(event.getMaxParticipants());
-        response.setHostingCompanies(event.getHostingCompanies());
-        response.setSpeakers(event.getSpeakers());
         return response;
     }
 
