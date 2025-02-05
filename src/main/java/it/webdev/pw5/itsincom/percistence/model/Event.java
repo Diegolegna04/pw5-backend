@@ -16,7 +16,7 @@ public class Event extends PanacheMongoEntity {
     private String type;
     private String title;
     private String location;
-    private List<String> hostingCompanies;
+    private List<Partner> partners;
     private List<Speaker> speakers;
     private List<ObjectId> participants;
     private Integer maxParticipants;
@@ -71,12 +71,12 @@ public class Event extends PanacheMongoEntity {
         this.location = location;
     }
 
-    public List<String> getHostingCompanies() {
-        return hostingCompanies;
+    public List<Partner> getPartners() {
+        return partners;
     }
 
-    public void setHostingCompanies(List<String> hostingCompanies) {
-        this.hostingCompanies = hostingCompanies;
+    public void setPartners(List<Partner> partners) {
+        this.partners = partners;
     }
 
     public List<Speaker> getSpeakers() {

@@ -13,6 +13,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
+
 import java.util.Collections;
 
 
@@ -25,7 +26,7 @@ public class AuthResource {
     private final SessionService sessionService;
     private final UserService userService;
 
-    public AuthResource(AuthService authService, SessionService sessionService, UserService userService){
+    public AuthResource(AuthService authService, SessionService sessionService, UserService userService) {
         this.authService = authService;
         this.sessionService = sessionService;
         this.userService = userService;
@@ -52,7 +53,13 @@ public class AuthResource {
         req.sanitize();
         Session s = authService.loginUser(req);
         return Response.ok().entity("{\"message\": \"Login succeeded\"}")
-                .cookie(new NewCookie.Builder("SESSION_COOKIE").value(s.getToken()).path("/").build())
+                .cookie(new NewCookie.Builder("SESSION_COOKIE")
+                        .value(s.getToken())
+                        .path("/")
+                        .sameSite(NewCookie.SameSite.NONE)
+                        .secure(true)
+                        .httpOnly(false)
+                        .build())
                 .build();
     }
 
@@ -66,8 +73,9 @@ public class AuthResource {
         NewCookie newCookie = new NewCookie.Builder("SESSION_COOKIE").value("")
                 .path("/")
                 .maxAge(0)
-                .httpOnly(true)
-                .secure(false)
+                .httpOnly(false)
+                .secure(true)
+                .sameSite(NewCookie.SameSite.NONE)
                 .build();
         return Response.ok().entity("{\"message\": \"Logout succeeded\"}").cookie(newCookie).build();
     }

@@ -73,7 +73,7 @@ public class EventService {
         updateFieldIfNotNull(existingEvent::setLocation, event.getLocation());
         updateFieldIfNotNull(existingEvent::setType, event.getType());
         updateFieldIfNotNull(existingEvent::setMaxParticipants, event.getMaxParticipants());
-        updateFieldIfNotNull(existingEvent::setHostingCompanies, event.getHostingCompanies());
+        updateFieldIfNotNull(existingEvent::setPartners, event.getPartners());
         updateFieldIfNotNull(existingEvent::setSpeakers, event.getSpeakers());
         updateFieldIfNotNull(existingEvent::setFilter, event.getFilter());
 
@@ -220,8 +220,8 @@ public class EventService {
         if (!oldEvent.getMaxParticipants().equals(newEvent.getMaxParticipants())) {
             changes.append("Max Participants: ").append(oldEvent.getMaxParticipants()).append(" -> ").append(newEvent.getMaxParticipants()).append("\n");
         }
-        if (!oldEvent.getHostingCompanies().equals(newEvent.getHostingCompanies())) {
-            changes.append("Hosting Companies: ").append(oldEvent.getHostingCompanies()).append(" -> ").append(newEvent.getHostingCompanies()).append("\n");
+        if (!oldEvent.getPartners().equals(newEvent.getPartners())) {
+            changes.append("Hosting Companies: ").append(oldEvent.getPartners()).append(" -> ").append(newEvent.getPartners()).append("\n");
         }
         if (!oldEvent.getSpeakers().equals(newEvent.getSpeakers())) {
             changes.append("Speakers: ").append(oldEvent.getSpeakers()).append(" -> ").append(newEvent.getSpeakers()).append("\n");
