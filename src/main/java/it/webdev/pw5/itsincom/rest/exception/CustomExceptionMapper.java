@@ -1,18 +1,23 @@
 package it.webdev.pw5.itsincom.rest.exception;
 
+import it.webdev.pw5.itsincom.service.LoggingService;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Provider
 public class CustomExceptionMapper implements ExceptionMapper<Exception> {
+    private static final Logger LOG = LoggerFactory.getLogger(CustomExceptionMapper.class);
 
     @Override
     public Response toResponse(Exception e) {
+        LOG.error("Error", e);
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("error", e.getClass().getSimpleName());
         errorResponse.put("message", getErrorMessage(e));
