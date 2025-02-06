@@ -11,20 +11,11 @@ public class Partner {
     String description;
     String number;
     String location;
-    String imageBase64;
+    ObjectId imageId;
     String websiteURL;
 
     public Partner(){
 
-    }
-    public Partner(ObjectId id, String name, String description, String number, String location, String imageBase64, String websiteURL) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.number = number;
-        this.location = location;
-        this.imageBase64 = imageBase64;
-        this.websiteURL = websiteURL;
     }
 
     public ObjectId getId() {
@@ -67,12 +58,12 @@ public class Partner {
         this.location = location;
     }
 
-    public String getImageBase64() {
-        return imageBase64;
+    public ObjectId getImageId() {
+        return imageId;
     }
 
-    public void setImageBase64(String imageBase64) {
-        this.imageBase64 = imageBase64;
+    public void setImageId(ObjectId imageId) {
+        this.imageId = imageId;
     }
 
     public String getWebsiteURL() {

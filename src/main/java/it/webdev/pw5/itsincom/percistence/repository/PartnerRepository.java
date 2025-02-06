@@ -13,7 +13,7 @@ public class PartnerRepository implements PanacheMongoRepository<Partner> {
         return listAll();
     }
 
-    public void addPartner(Partner p){
+    public void createPartner(Partner p){
         persist(p);
     }
 
