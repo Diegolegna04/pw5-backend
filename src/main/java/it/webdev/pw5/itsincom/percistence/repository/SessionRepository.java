@@ -1,6 +1,7 @@
 package it.webdev.pw5.itsincom.percistence.repository;
 
 import io.quarkus.mongodb.panache.PanacheMongoRepository;
+import io.quarkus.scheduler.Scheduled;
 import it.webdev.pw5.itsincom.percistence.model.Session;
 import it.webdev.pw5.itsincom.service.exception.SessionNotFound;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,5 +51,10 @@ public class SessionRepository implements PanacheMongoRepository<Session> {
 
     public String UUIDGenerator() {
         return UUID.randomUUID().toString();
+    }
+
+    @Scheduled(every = "2h")
+    void deleteExpiredSessions() {
+        delete("creationDate < ?1", LocalDateTime.now().minusDays(1));
     }
 }
