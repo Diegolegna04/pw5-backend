@@ -17,6 +17,15 @@ public class Partner {
     public Partner(){
 
     }
+    public Partner(ObjectId id, String name, String description, String number, String location, ObjectId imageId, String websiteURL) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.number = number;
+        this.location = location;
+        this.imageId = imageId;
+        this.websiteURL = websiteURL;
+    }
 
     public ObjectId getId() {
         return id;

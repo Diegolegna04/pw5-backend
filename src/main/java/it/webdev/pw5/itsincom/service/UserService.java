@@ -52,7 +52,7 @@ public class UserService {
         return getBookingsForUser(userId);
     }
 
-    public List<BookingResponse> getBookingsForUser(ObjectId userId) throws UserNotFound {
+    public List<BookingResponse>    getBookingsForUser(ObjectId userId) throws UserNotFound {
         User user = userRepository.findUserById(userId);
         if (user == null) {
             throw new UserNotFound();
