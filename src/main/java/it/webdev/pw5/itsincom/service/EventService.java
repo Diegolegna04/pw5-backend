@@ -80,10 +80,13 @@ public class EventService {
         eventRepository.updateEvent(existingEvent);
 
         // Fetch email addresses of participants
-        List<String> participantEmails = existingEvent.getParticipants().stream()
+        List<String> participantEmails = (existingEvent.getParticipants() != null)
+                ? existingEvent.getParticipants().stream()
                 .map(userRepository::findUserById)
+                .filter(Objects::nonNull)
                 .map(User::getEmail)
-                .collect(Collectors.toList());
+                .toList()
+                : new ArrayList<>();
 
         String subject = "Event Updated: " + existingEvent.getTitle();
         String body = "The event you are participating in has been updated. Please check the details.\n\n" + changesSummary;
